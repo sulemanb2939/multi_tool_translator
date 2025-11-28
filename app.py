@@ -3,7 +3,6 @@ import uuid
 import io
 import zipfile
 import threading
-import time
 from datetime import datetime
 
 from flask import (
@@ -75,39 +74,36 @@ def chunk_text(text, max_len=MAX_CHARS_PER_CHUNK):
     return chunks
 
 
-# -------- FIXED: TRANSLATE BIG TEXT WITH RETRY & NO CRASH -------- #
-def translate_big_text(text, lang_name):
-    """
-    Text ko chunks me tod ke GoogleTranslator se translate karta hai.
-    Agar kahin error aaye, to 3 baar retry, phir original chunk add kar deta hai
-    taa ke code crash na ho.
-    """
+# -------- PREMIUM FIX: Chunk-Level Smooth Progress -------- #
+def translate_big_text(text, lang_name, job, total_tasks, done_tasks):
     lang_code = LANGUAGE_CODES[lang_name]
     translator = GoogleTranslator(source="en", target=lang_code)
 
     chunks = chunk_text(text)
     translated_chunks = []
+    total_chunks = len(chunks)
 
-    if not chunks:
+    if total_chunks == 0:
         return ""
 
-    for chunk in chunks:
-        translated = None
-        # retry up to 3 times
-        for attempt in range(3):
-            try:
-                translated = translator.translate(chunk)
-                break
-            except Exception as e:
-                # thoda sa wait karo, phir dobara try
-                time.sleep(1)
+    for idx, chunk in enumerate(chunks, start=1):
+        # Smooth chunk progress (per chunk)
+        sub_progress = int((idx / total_chunks) * 100)
+        job["sub_progress"] = sub_progress
 
-        if translated is None:
-            # agar teen baar bhi fail ho jaye, to original chunk hi likh do
-            translated = chunk
-
+        translated = translator.translate(chunk)
         translated_chunks.append(translated)
 
+        # Combine task progress + chunk progress
+        base_task_progress = int((done_tasks / total_tasks) * 100)
+        blended = base_task_progress + int(sub_progress / total_tasks)
+
+        if blended > 99:
+            blended = 99
+
+        job["progress"] = blended
+
+    job["sub_progress"] = 100
     return "\n".join(translated_chunks)
 
 
@@ -124,12 +120,6 @@ def run_translation_job(job_id):
     langs = job["languages"]
 
     total_tasks = (len(files_data) * len(langs)) + (len(langs) if text_input else 0)
-    if total_tasks == 0:
-        job["status"] = "error"
-        job["message"] = "No tasks to process."
-        job["progress"] = 0
-        return
-
     done_tasks = 0
 
     zip_buffer = io.BytesIO()
@@ -143,7 +133,7 @@ def run_translation_job(job_id):
             for lang in langs:
                 job["message"] = f"Translating '{base_name}' → {lang}..."
 
-                translated = translate_big_text(text, lang)
+                translated = translate_big_text(text, lang, job, total_tasks, done_tasks)
 
                 safe_lang = lang.replace(" ", "_")
                 outname = f"{base_name}_{safe_lang}.txt"
@@ -159,7 +149,7 @@ def run_translation_job(job_id):
             for lang in langs:
                 job["message"] = f"Translating pasted text → {lang}..."
 
-                translated = translate_big_text(text_input, lang)
+                translated = translate_big_text(text_input, lang, job, total_tasks, done_tasks)
 
                 safe_lang = lang.replace(" ", "_")
                 outname = f"{pseudo}_{safe_lang}.txt"
@@ -205,7 +195,7 @@ def start_translation():
             base, _ = os.path.splitext(name)
             try:
                 content = file.read().decode("utf-8", errors="ignore")
-            except Exception:
+            except:
                 continue
             if content.strip():
                 files_data.append({"name": base, "text": content})
@@ -219,7 +209,7 @@ def start_translation():
         "text": text_input,
         "languages": langs,
         "zip": None,
-        "start_time": datetime.utcnow(),
+        "start_time": None,
         "sub_progress": 0,
     }
 
@@ -235,16 +225,16 @@ def progress(job_id):
     if not job:
         return jsonify({"status": "error", "message": "Invalid job"})
 
-    progress_val = job.get("progress", 0)
+    progress = job.get("progress", 0)
     message = job.get("message", "")
     status = job.get("status", "")
     start = job.get("start_time")
 
     eta = ""
-    if start and 0 < progress_val < 100:
+    if start and 0 < progress < 100:
         elapsed = (datetime.utcnow() - start).total_seconds()
-        if progress_val > 0:
-            total_est = elapsed / (progress_val / 100.0)
+        if progress > 0:
+            total_est = elapsed / (progress / 100)
             remain = int(total_est - elapsed)
             if remain < 60:
                 eta = f"~{remain}s"
@@ -253,7 +243,7 @@ def progress(job_id):
 
     return jsonify({
         "status": status,
-        "progress": progress_val,
+        "progress": progress,
         "message": message,
         "eta": eta
     })
@@ -278,5 +268,4 @@ def download(job_id):
 
 
 if __name__ == "__main__":
-    # threaded=True taake background thread + Flask request saath chal sakein
     app.run(debug=True, threaded=True)
