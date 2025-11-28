@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile Responsive -->
     <title>My Tools – Professional Utilities</title>
-    
+
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -11,84 +12,134 @@
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #e3f2fd, #fce4ec);
+            background: linear-gradient(180deg, #0f172a, #1e1b4b, #4a148c);
+            min-height: 100vh;
+            color: #e0e0e0;
         }
 
         header {
-            background: linear-gradient(135deg, #1a237e, #4a148c);
-            color: #fff;
+            background: rgba(15, 23, 42, 0.7);
             padding: 25px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            text-align: center;
+            backdrop-filter: blur(6px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         header h1 {
             margin: 0;
             font-weight: 600;
-            letter-spacing: 1px;
-            text-align: center;
+            font-size: 24px;
+            color: #ffffff;
+            letter-spacing: 0.5px;
         }
 
         .container {
             max-width: 950px;
-            margin: 40px auto;
-            background: #fff;
-            padding: 30px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .intro {
+            background: rgba(255,255,255,0.06);
+            padding: 20px 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.25);
+            margin-bottom: 25px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.08);
         }
 
-        h2 {
+        .intro h2 {
             margin-top: 0;
+            color: #ffffff;
             font-weight: 600;
-            color: #333;
+            font-size: 22px;
         }
 
-        p {
+        .intro p {
+            color: #d1d5db;
             line-height: 1.7;
-            color: #444;
+            margin: 10px 0 5px;
+            font-size: 15px;
         }
 
         .tool-card {
-            background: #fafafa;
-            border-radius: 10px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 14px;
             padding: 20px;
-            margin-bottom: 20px;
-            transition: 0.3s ease;
-            border-left: 5px solid #673ab7;
+            margin-bottom: 18px;
+            border-left: 5px solid #7c3aed;
+            transition: 0.25s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            backdrop-filter: blur(6px);
         }
 
         .tool-card:hover {
-            background: #f3e5f5;
             transform: translateY(-4px);
+            background: rgba(255,255,255,0.12);
         }
 
         .tool-card h3 {
-            margin: 0 0 10px;
+            margin: 0 0 8px;
+            color: #c084fc;
             font-weight: 600;
-            color: #4a148c;
         }
 
         .tool-card p {
-            margin: 0 0 15px;
+            margin: 0 0 12px;
+            color: #e5e5e5;
+            font-size: 14px;
+            line-height: 1.6;
         }
 
-        a.btn {
+        .btn {
             display: inline-block;
             padding: 10px 18px;
-            background: #4a148c;
+            background: linear-gradient(90deg, #0ea5e9, #6366f1);
             color: #fff;
             text-decoration: none;
-            border-radius: 6px;
-            transition: 0.3s;
+            border-radius: 999px;
             font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 0 25px rgba(56,189,248,0.4);
+            transition: 0.2s;
         }
 
-        a.btn:hover {
-            background: #6a1b9a;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(56,189,248,0.6);
+        }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 20px;
+            }
+            .intro {
+                padding: 18px 20px;
+            }
+            .intro h2 {
+                font-size: 18px;
+            }
+            .tool-card {
+                padding: 16px;
+            }
+            .tool-card h3 {
+                font-size: 16px;
+            }
+            .tool-card p {
+                font-size: 13px;
+            }
+            .btn {
+                display: block;
+                text-align: center;
+                width: 100%;
+                padding: 12px;
+            }
         }
     </style>
 </head>
+
 <body>
 
 <header>
@@ -96,11 +147,16 @@
 </header>
 
 <div class="container">
-    <h2>Welcome to Your Tools Dashboard</h2>
-    <p>
-        Yeh page specially isliye banaya gaya hai taake aap apne daily kaam ko easy, fast
-        aur professional bana saken. Neeche diye gaye tools aapke workflow ko smooth karte hain.
-    </p>
+
+    <!-- Intro Section -->
+    <div class="intro">
+        <h2>Welcome to Your Tools Dashboard</h2>
+        <p>
+            Yeh page specially banaya gaya hai aapke daily workflows ko fast, smooth
+            aur professional banane ke liye. Neeche diye gaye tools aapko high-accuracy
+            and super-fast results dete hain.
+        </p>
+    </div>
 
     <!-- Translator Tool -->
     <div class="tool-card">
@@ -108,16 +164,16 @@
         <p>
             ✔ Ek saath multiple English files upload karein<br>
             ✔ Multiple languages choose karein<br>
-            ✔ Har file sab selected languages me auto-translate hogi<br>
-            ✔ Saari translated files ek ZIP me download karein<br><br>
-            Yeh advanced translator large scripts, novels aur documents ke liye perfect hai.
+            ✔ Har file sab languages me auto-translate hogi<br>
+            ✔ Saara output ZIP file me download karein<br><br>
+            Large scripts, novels, documents ke liye best tool.
         </p>
         <a class="btn" href="{{ url_for('translator') }}">Open Translator →</a>
     </div>
 
-    <!-- Add more custom tool cards here if needed -->
-    
+    <!-- More tools can be added below -->
 </div>
 
 </body>
 </html>
+
