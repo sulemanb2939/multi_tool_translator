@@ -2,259 +2,550 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Language Translator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Inter Font (Professional) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --bg-main: #020617;
+            --bg-card: #020617;
+            --bg-page: #020617;
+            --border-subtle: #1e293b;
+            --accent: #38bdf8;
+            --accent-2: #6366f1;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
             padding: 0;
-            background: #0f172a;
-            color: #e5e7eb;
+            background: radial-gradient(circle at top, #0b1120 0, #020617 45%, #000 100%);
+            color: var(--text-main);
         }
 
         header {
-            background: #020617;
+            background: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(18px);
             color: #fff;
-            padding: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+            padding: 14px 18px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.7);
+            border-bottom: 1px solid rgba(148,163,184,0.25);
+            position: sticky;
+            top: 0;
+            z-index: 30;
         }
 
-        a { color: #38bdf8; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .header-title {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: 0.03em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-pill {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .back-link {
+            color: var(--accent);
+            font-size: 13px;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(56,189,248,0.4);
+            background: radial-gradient(circle at top, rgba(56,189,248,0.18), transparent);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .back-link:hover {
+            border-color: rgba(56,189,248,0.8);
+        }
 
         .container {
             max-width: 1100px;
-            margin: 30px auto;
-            background: #020617;
-            padding: 20px 24px;
-            border-radius: 16px;
-            box-shadow: 0 20px 50px rgba(15,23,42,0.9);
-            border: 1px solid #1e293b;
+            margin: 24px auto 32px;
+            background: radial-gradient(circle at top left, rgba(56,189,248,0.08), transparent 55%),
+                        radial-gradient(circle at bottom right, rgba(99,102,241,0.08), transparent 55%),
+                        var(--bg-card);
+            padding: 22px 22px 24px;
+            border-radius: 18px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(30,41,59,0.9);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                margin: 16px;
+                padding: 16px 14px 18px;
+            }
+            .header-title h1 {
+                font-size: 16px;
+            }
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .note {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
         }
 
         textarea {
             width: 100%;
-            height: 160px;
-            background: #020617;
-            color: #e5e7eb;
+            min-height: 150px;
+            background: rgba(15,23,42,0.95);
+            color: var(--text-main);
             border-radius: 10px;
-            border: 1px solid #1e293b;
+            border: 1px solid var(--border-subtle);
             padding: 10px;
             resize: vertical;
+            font-family: inherit;
+            font-size: 14px;
         }
 
         textarea:focus {
             outline: none;
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 1px #38bdf8;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent);
         }
 
-        button {
-            margin-top: 15px;
-            padding: 12px 24px;
+        input[type="file"] {
+            margin-top: 5px;
+            color: var(--text-main);
+            font-size: 13px;
+        }
+
+        button.primary-btn {
+            margin-top: 18px;
+            padding: 11px 22px;
             border: none;
-            background: linear-gradient(90deg, #0ea5e9, #6366f1);
+            background: linear-gradient(120deg, #0ea5e9, #6366f1, #22c55e);
+            background-size: 200% 100%;
             color: #fff;
             border-radius: 999px;
             cursor: pointer;
             font-weight: 600;
+            letter-spacing: 0.03em;
+            box-shadow: 0 18px 45px rgba(56,189,248,0.45);
+            transition: transform 0.08s ease, box-shadow 0.08s ease, background-position 0.3s ease;
             width: 100%;
-            font-size: 16px;
-            box-shadow: 0 10px 30px rgba(56,189,248,0.35);
+            font-size: 15px;
+        }
+        button.primary-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 22px 55px rgba(56,189,248,0.65);
+            background-position: 100% 0;
+        }
+        button.primary-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 10px 28px rgba(56,189,248,0.4);
         }
 
-        /* DROPDOWN */
-        .dropdown { position: relative; margin-bottom: 20px; width: 100%; }
+        /* Neon Dropdown */
+        .dropdown-wrapper {
+            position: relative;
+            margin-bottom: 18px;
+        }
 
-        .dropdown-btn {
+        .dropdown-toggle {
             width: 100%;
-            padding: 14px;
-            background: #020617;
-            border: 1px solid #1e293b;
-            border-radius: 12px;
-            color: #e5e7eb;
-            font-size: 16px;
-            text-align: left;
+            padding: 11px 14px;
+            background: radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 55%), #020617;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
             cursor: pointer;
+            box-shadow: 0 10px 30px rgba(15,23,42,0.8);
         }
 
-        .dropdown-content {
+        .dropdown-toggle span.label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-count {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(56,189,248,0.18);
+            border: 1px solid rgba(56,189,248,0.5);
+            color: #e0f2fe;
+        }
+
+        .chevron {
+            font-size: 14px;
+            opacity: 0.75;
+        }
+
+        .dropdown-panel {
             position: absolute;
-            width: 100%;
-            background: #0b1120;
-            border-radius: 12px;
-            border: 1px solid #1e293b;
-            padding: 10px;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 320px;
+            max-height: 340px;
+            background: radial-gradient(circle at top left, rgba(56,189,248,0.14), rgba(15,23,42,0.98));
+            border-radius: 16px;
+            border: 1px solid rgba(51,65,85,0.95);
+            box-shadow: 0 22px 60px rgba(0,0,0,0.85);
+            padding: 10px 10px 12px;
             display: none;
-            max-height: 280px;
-            overflow-y: auto;
             z-index: 9999;
         }
 
-        .dropdown-content.show { display: block; }
+        .dropdown-panel.show {
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            .dropdown-panel {
+                left: 0;
+                right: 0;
+                width: 100%;
+            }
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .panel-title {
+            font-size: 13px;
+            color: #e5e7eb;
+        }
+
+        .panel-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .panel-actions button {
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.4);
+            background: rgba(15,23,42,0.9);
+            color: var(--text-main);
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .panel-actions button:hover {
+            border-color: var(--accent);
+            background: rgba(15,23,42,1);
+        }
 
         .dropdown-search {
             width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #1e293b;
-            background: #020617;
-            color: #e5e7eb;
-            margin-bottom: 10px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(51,65,85,0.9);
+            background: rgba(15,23,42,0.98);
+            color: var(--text-main);
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        .dropdown-search:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+
+        .lang-list {
+            max-height: 220px;
+            overflow-y: auto;
+            border-radius: 10px;
+            padding-right: 2px;
         }
 
         .dropdown-item {
             display: flex;
             align-items: center;
-            padding: 6px;
+            padding: 4px 6px;
             border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .dropdown-item:hover { background: #1e293b; }
-
-        .dropdown-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .dropdown-actions button {
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: 1px solid #1e293b;
-            background: #020617;
-            color: #e5e7eb;
-            font-size: 12px;
+            font-size: 13px;
             cursor: pointer;
         }
+        .dropdown-item:hover {
+            background: rgba(15,23,42,0.9);
+        }
+        .dropdown-item input {
+            margin-right: 8px;
+        }
 
-        /* OVERLAY */
+        .panel-footer {
+            margin-top: 8px;
+        }
+
+        .done-btn {
+            width: 100%;
+            padding: 7px 0;
+            border-radius: 999px;
+            border: 1px solid rgba(34,197,94,0.7);
+            background: radial-gradient(circle at top, rgba(34,197,94,0.22), rgba(22,163,74,0.9));
+            color: #ecfdf5;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .done-btn:hover {
+            filter: brightness(1.05);
+        }
+
+        /* Alerts (flashes) */
+        .alert {
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .alert.error {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid #f97373;
+            color: #fecaca;
+        }
+        .alert.success {
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid #22c55e;
+            color: #bbf7d0;
+        }
+
+        /* PREMIUM OVERLAY */
         .overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15,23,42,0.92);
+            background: radial-gradient(circle at top, rgba(56,189,248,0.08), rgba(15,23,42,0.98));
             display: flex;
-            justify-content: center;
             align-items: center;
-            z-index: 99999;
-            padding: 10px;
+            justify-content: center;
+            z-index: 9999;
+            padding: 12px;
         }
-
         .overlay.hidden { display: none; }
 
         .overlay-card {
-            width: 90%;
-            max-width: 380px;
+            width: 360px;
+            max-width: 100%;
             background: #020617;
             border-radius: 18px;
-            padding: 20px;
-            border: 1px solid #1e293b;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+            padding: 18px 18px 14px;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.9);
+            border: 1px solid rgba(148,163,184,0.4);
         }
+
+        .overlay-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 0 0 rgba(34,197,94,0.8);
+            animation: pulse 1.3s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.8); }
+            70% { box-shadow: 0 0 0 10px rgba(34,197,94,0); }
+            100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+        }
+
+        .overlay-status-main { font-size: 14px; font-weight: 600; }
+        .overlay-status-sub { font-size: 12px; color: #9ca3af; margin-bottom: 10px; }
 
         .progress-outer {
             width: 100%;
             height: 14px;
+            background: #020617;
             border-radius: 999px;
             border: 1px solid #1e293b;
-            background: #020617;
-            margin-top: 10px;
             overflow: hidden;
         }
-
         .progress-inner {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg,#0ea5e9,#6366f1,#22c55e);
+            border-radius: inherit;
+            background-image: linear-gradient(90deg, #0ea5e9, #6366f1, #22c55e);
             background-size: 200% 100%;
             animation: progressGradient 1s linear infinite;
         }
-
         @keyframes progressGradient {
-            from { background-position: 0% 50%; }
-            to { background-position: 100% 50%; }
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .overlay-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 480px) {
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .back-link {
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
-
 <body>
 
 <header>
-    <div style="max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center;">
-        <h1 style="margin:0;">Multi-Language Script Translator</h1>
-        <a href="{{ url_for('home') }}">← Back</a>
+    <div class="header-inner">
+        <div class="header-title">
+            <h1>
+                <span>🌐 Multi-Language Script Translator</span>
+            </h1>
+            <span class="header-pill">Premium progress · Multi-file · Multi-language · ZIP export</span>
+        </div>
+        <a href="{{ url_for('home') }}" class="back-link">
+            ← Back to Home
+        </a>
     </div>
 </header>
 
 <div class="container">
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <div class="alert {{ category }}">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <form id="translateForm">
+        <!-- LANGUAGES -->
+        <div style="margin-bottom: 16px;">
+            <div class="section-title">1. Select Target Languages</div>
+            <div class="note">Choose one or multiple languages. Use search to filter.</div>
 
-        <!-- LANGUAGE SECTION -->
-        <div class="section-title">1. Select Target Languages</div>
-        <div class="note">Choose one or multiple languages.</div>
-
-        <div class="dropdown">
-            <button type="button" class="dropdown-btn" id="dropdownToggle">Select Languages ▼</button>
-
-            <div class="dropdown-content" id="dropdownMenu">
-
-                <input type="text" id="dropdownSearch" class="dropdown-search" placeholder="Search languages...">
-
-                <div class="dropdown-actions">
-                    <button type="button" onclick="selectAllLanguages()">Select All</button>
-                    <button type="button" onclick="clearAllLanguages()">Clear All</button>
-                </div>
-
-                <div id="langList">
-                    {% for lang in languages %}
-                    <label class="dropdown-item">
-                        <input type="checkbox" name="languages" value="{{ lang }}">
-                        {{ lang }}
-                    </label>
-                    {% endfor %}
-                </div>
-
-                <!-- DONE BUTTON -->
-                <button type="button" id="closeDropdownBtn"
-                    style="margin-top:12px; width:100%; padding:10px; background:#1e293b; color:#fff; border-radius:8px; border:none;">
-                    Done ✔
+            <div class="dropdown-wrapper">
+                <button type="button" class="dropdown-toggle" id="dropdownToggle">
+                    <span class="label">
+                        <span id="dropdownLabel">Select languages</span>
+                        <span class="badge-count" id="selectedCount">0 selected</span>
+                    </span>
+                    <span class="chevron">▾</span>
                 </button>
 
+                <div class="dropdown-panel" id="dropdownPanel">
+                    <div class="panel-header">
+                        <div>
+                            <div class="panel-title">Languages</div>
+                            <div class="panel-sub">Scroll to see all supported languages.</div>
+                        </div>
+                        <div class="panel-actions">
+                            <button type="button" id="selectAllBtn">Select All</button>
+                            <button type="button" id="clearAllBtn">Clear</button>
+                        </div>
+                    </div>
+
+                    <input type="text" id="dropdownSearch" class="dropdown-search" placeholder="Search language… (e.g. Urdu, Spanish)">
+
+                    <div class="lang-list" id="langList">
+                        {% for lang in languages %}
+                        <label class="dropdown-item">
+                            <input type="checkbox" name="languages" value="{{ lang }}">
+                            {{ lang }}
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <div class="panel-footer">
+                        <button type="button" class="done-btn" id="doneBtn">Done ✓</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- FILE UPLOAD -->
-        <div class="section-title">2. Upload Script Files</div>
-        <input type="file" name="files" multiple accept=".txt" style="width:100%; margin-bottom:10px;">
+        <!-- FILES -->
+        <div style="margin-top: 10px;">
+            <div class="section-title">2. Upload English Script Files</div>
+            <div class="note">You can upload multiple .txt files. Each will be translated into all selected languages.</div>
+            <input type="file" name="files" multiple accept=".txt">
+        </div>
 
-        <!-- TEXT INPUT -->
-        <div class="section-title">3. Or Paste English Text</div>
-        <textarea name="text_input" placeholder="Paste your English script here..."></textarea>
+        <!-- TEXTAREA -->
+        <div style="margin-top: 16px;">
+            <div class="section-title">3. Or paste English text (optional)</div>
+            <div class="note">If you paste text here, it will also be translated like a separate file.</div>
+            <textarea name="text_input" placeholder="Paste your English script here (optional)…"></textarea>
+        </div>
 
-        <button type="submit">Translate & Download ZIP</button>
-
+        <button type="submit" class="primary-btn">Translate & Download ZIP</button>
     </form>
 </div>
 
-<!-- OVERLAY -->
+<!-- PREMIUM OVERLAY -->
 <div id="overlay" class="overlay hidden">
     <div class="overlay-card">
-        <div style="display:flex; align-items:center;">
-            <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;margin-right:8px;"></div>
-            <div id="overlayMainText">Starting...</div>
+        <div class="overlay-title">
+            <div class="pulse-dot"></div>
+            <div>
+                <div class="overlay-status-main" id="overlayMainText">Preparing job…</div>
+                <div class="overlay-status-sub" id="overlaySubText">Please keep this tab open while we translate your files.</div>
+            </div>
         </div>
-
-        <div id="overlaySubText" style="font-size:12px;color:#9ca3af;margin-top:6px;">Please wait…</div>
 
         <div class="progress-outer">
             <div class="progress-inner" id="progressInner"></div>
         </div>
 
-        <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; color:#9ca3af;">
+        <div class="overlay-footer">
             <div id="progressLabel">0%</div>
             <div id="etaLabel"></div>
         </div>
@@ -262,41 +553,172 @@
 </div>
 
 <script>
-/* DROPDOWN TOGGLE */
-const toggleBtn = document.getElementById("dropdownToggle");
-const dropdownMenu = document.getElementById("dropdownMenu");
+    // ========== DROPDOWN LOGIC ==========
+    const dropdownToggle = document.getElementById("dropdownToggle");
+    const dropdownPanel = document.getElementById("dropdownPanel");
+    const dropdownSearch = document.getElementById("dropdownSearch");
+    const langList = document.getElementById("langList");
+    const selectAllBtn = document.getElementById("selectAllBtn");
+    const clearAllBtn = document.getElementById("clearAllBtn");
+    const doneBtn = document.getElementById("doneBtn");
+    const selectedCount = document.getElementById("selectedCount");
+    const dropdownLabel = document.getElementById("dropdownLabel");
 
-toggleBtn.addEventListener("click", () => {
-    dropdownMenu.classList.toggle("show");
-});
+    function updateSelectedSummary() {
+        const checked = langList.querySelectorAll("input[name='languages']:checked");
+        const count = checked.length;
+        selectedCount.textContent = count + " selected";
 
-/* CLOSE ON OUTSIDE CLICK */
-document.addEventListener("click", function (e) {
-    if (!dropdownMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
-        dropdownMenu.classList.remove("show");
+        if (count === 0) {
+            dropdownLabel.textContent = "Select languages";
+        } else if (count === 1) {
+            dropdownLabel.textContent = checked[0].value;
+        } else if (count <= 3) {
+            const names = Array.from(checked).map(cb => cb.value).join(", ");
+            dropdownLabel.textContent = names;
+        } else {
+            dropdownLabel.textContent = checked[0].value + " +" + (count - 1);
+        }
     }
-});
 
-/* SEARCH */
-document.getElementById("dropdownSearch").addEventListener("input", () => {
-    let val = dropdownSearch.value.toLowerCase();
-    document.querySelectorAll(".dropdown-item").forEach(item => {
-        item.style.display = item.textContent.toLowerCase().includes(val) ? "flex" : "none";
+    dropdownToggle.addEventListener("click", () => {
+        dropdownPanel.classList.toggle("show");
     });
-});
 
-/* SELECT ALL / CLEAR ALL */
-function selectAllLanguages() {
-    document.querySelectorAll("input[name='languages']").forEach(cb => cb.checked = true);
-}
-function clearAllLanguages() {
-    document.querySelectorAll("input[name='languages']").forEach(cb => cb.checked = false);
-}
+    document.addEventListener("click", (e) => {
+        if (!dropdownPanel.contains(e.target) && !dropdownToggle.contains(e.target)) {
+            dropdownPanel.classList.remove("show");
+        }
+    });
 
-/* DONE BUTTON */
-document.getElementById("closeDropdownBtn").addEventListener("click", () => {
-    dropdownMenu.classList.remove("show");
-});
+    dropdownSearch.addEventListener("input", () => {
+        const term = dropdownSearch.value.toLowerCase();
+        const items = langList.querySelectorAll(".dropdown-item");
+        items.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            item.style.display = text.includes(term) ? "flex" : "none";
+        });
+    });
+
+    selectAllBtn.addEventListener("click", () => {
+        const checkboxes = langList.querySelectorAll("input[name='languages']");
+        checkboxes.forEach(cb => cb.checked = true);
+        updateSelectedSummary();
+    });
+
+    clearAllBtn.addEventListener("click", () => {
+        const checkboxes = langList.querySelectorAll("input[name='languages']");
+        checkboxes.forEach(cb => cb.checked = false);
+        updateSelectedSummary();
+    });
+
+    langList.addEventListener("change", () => {
+        updateSelectedSummary();
+    });
+
+    doneBtn.addEventListener("click", () => {
+        dropdownPanel.classList.remove("show");
+        updateSelectedSummary();
+    });
+
+    // ========== OVERLAY + PROGRESS LOGIC ==========
+    const overlay = document.getElementById("overlay");
+    const overlayMainText = document.getElementById("overlayMainText");
+    const overlaySubText = document.getElementById("overlaySubText");
+    const progressInner = document.getElementById("progressInner");
+    const progressLabel = document.getElementById("progressLabel");
+    const etaLabel = document.getElementById("etaLabel");
+
+    let pollInterval = null;
+
+    function showOverlay() {
+        overlay.classList.remove("hidden");
+        progressInner.style.width = "0%";
+        progressLabel.textContent = "0%";
+        etaLabel.textContent = "";
+        overlayMainText.textContent = "Starting translation...";
+        overlaySubText.textContent = "Please keep this tab open. We’ll download your ZIP automatically once done.";
+    }
+
+    function hideOverlay() {
+        overlay.classList.add("hidden");
+    }
+
+    function startPolling(jobId) {
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(() => {
+            fetch(`/progress/${jobId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "error") {
+                        overlayMainText.textContent = "Error";
+                        overlaySubText.textContent = data.message || "Something went wrong.";
+                        clearInterval(pollInterval);
+                        setTimeout(hideOverlay, 2000);
+                        return;
+                    }
+
+                    overlayMainText.textContent = data.message || "Translating...";
+                    const prog = data.progress || 0;
+                    progressInner.style.width = prog + "%";
+                    progressLabel.textContent = prog + "%";
+                    etaLabel.textContent = data.eta || "";
+
+                    if (data.status === "done") {
+                        overlayMainText.textContent = "Done!";
+                        overlaySubText.textContent = "Your ZIP is ready. Downloading now...";
+                        progressInner.style.width = "100%";
+                        progressLabel.textContent = "100%";
+                        clearInterval(pollInterval);
+                        window.location = `/download/${jobId}`;
+                        setTimeout(() => {
+                            hideOverlay();
+                        }, 3000);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        }, 1000);
+    }
+
+    // ========== FORM SUBMIT ==========
+    const form = document.getElementById("translateForm");
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const langs = formData.getAll("languages");
+        if (!langs || langs.length === 0) {
+            alert("Please select at least one language.");
+            return;
+        }
+
+        showOverlay();
+
+        fetch("/start-translation", {
+            method: "POST",
+            body: formData
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    const jobId = data.job_id;
+                    overlayMainText.textContent = "Job started...";
+                    startPolling(jobId);
+                } else {
+                    overlayMainText.textContent = "Error";
+                    overlaySubText.textContent = data.message || "Something went wrong before starting.";
+                    setTimeout(hideOverlay, 2000);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                overlayMainText.textContent = "Error";
+                overlaySubText.textContent = "Network error. Please try again.";
+                setTimeout(hideOverlay, 2000);
+            });
+    });
 </script>
 
 </body>
