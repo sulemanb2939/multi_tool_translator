@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multi-Language Translator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #e5e7eb; }
+        header { background: #020617; color: #fff; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.6); }
+        a { color: #38bdf8; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .container { max-width: 1100px; margin: 30px auto; background: #020617; padding: 20px 24px; border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(15,23,42,0.9); border: 1px solid #1e293b; }
+
+        label { display: block; margin-top: 10px; font-weight: 600; }
+        textarea { width: 100%; height: 160px; background: #020617; color: #e5e7eb; border-radius: 10px;
+            border: 1px solid #1e293b; padding: 10px; resize: vertical; }
+        textarea:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 0 1px #38bdf8; }
+
+        button { margin-top: 15px; padding: 10px 22px; border: none; background: linear-gradient(90deg, #0ea5e9, #6366f1);
+            color: #fff; border-radius: 999px; cursor: pointer; font-weight: 600; letter-spacing: 0.3px;
+            box-shadow: 0 10px 30px rgba(56,189,248,0.35); transition: .1s; }
+        button:hover { transform: translateY(-1px); box-shadow: 0 14px 40px rgba(56,189,248,0.5); }
+
+        .section-title { font-size: 18px; margin-bottom: 6px; }
+        .note { font-size: 0.85em; color: #9ca3af; }
+
+        /* PREMIUM DROPDOWN */
+        .dropdown { position: relative; margin-bottom: 20px; }
+        .dropdown-btn {
+            width: 100%; padding: 12px; background: #020617; border: 1px solid #1e293b; border-radius: 12px;
+            color: #e5e7eb; font-size: 15px; text-align: left; cursor: pointer;
+        }
+        .dropdown-btn:hover { border-color: #38bdf8; }
+
+        .dropdown-content {
+            position: absolute; width: 100%; background: #0b1120; border-radius: 12px; border: 1px solid #1e293b;
+            padding: 10px; display: none; max-height: 300px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            z-index: 9999;
+        }
+        .dropdown-content.show { display: block; }
+
+        .dropdown-search {
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #1e293b; background: #020617; color: #e5e7eb;
+            margin-bottom: 10px;
+        }
+
+        .dropdown-item {
+            display: flex; align-items: center; padding: 6px; cursor: pointer; border-radius: 8px; color: #e5e7eb;
+        }
+        .dropdown-item:hover { background: #1e293b; }
+        .dropdown-item input { margin-right: 10px; }
+
+        .dropdown-actions {
+            display: flex; justify-content: space-between; margin-bottom: 8px;
+        }
+        .dropdown-actions button {
+            padding: 6px 14px; border-radius: 999px; border: 1px solid #1e293b; background: #020617;
+            color: #e5e7eb; cursor: pointer; font-size: 12px;
+        }
+        .dropdown-actions button:hover { background: #0b1120; border-color: #38bdf8; }
+
+        /* PREMIUM OVERLAY */
+        .overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.95); display: flex; align-items: center;
+            justify-content: center; z-index: 10000; }
+        .overlay.hidden { display: none; }
+        .overlay-card {
+            width: 380px; background: #020617; border-radius: 18px; padding: 20px;
+            border: 1px solid #1e293b; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+        }
+        .pulse-dot { width: 10px; height:10px; background:#22c55e; border-radius:999px; animation:pulse 1.2s infinite;
+            margin-right: 8px; }
+        @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(34,197,94,0.6);}
+            70%{box-shadow:0 0 0 10px rgba(34,197,94,0);}
+            100%{box-shadow:0 0 0 0 rgba(34,197,94,0);} }
+
+        .progress-outer { width:100%; height:14px; border-radius:999px; background:#020617; border:1px solid #1e293b;
+            overflow:hidden; margin-top:10px; }
+        .progress-inner { height:100%; width:0%; background:linear-gradient(90deg,#0ea5e9,#6366f1,#22c55e);
+            background-size:200% 100%; animation:progressGradient 1s linear infinite; }
+        @keyframes progressGradient {
+            0% { background-position:0% 50%; } 100% { background-position:100% 50%; }
+        }
+
+    </style>
+</head>
+
+<body>
+<header>
+    <div style="max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center;">
+        <h1 style="margin:0; font-size:20px;">Multi-Language Script Translator</h1>
+        <a href="{{ url_for('home') }}">← Back to Home</a>
+    </div>
+</header>
+
+<div class="container">
+
+    <form id="translateForm">
+
+        <!-- NEW PREMIUM DROPDOWN -->
+        <div class="section-title">1. Select Target Languages</div>
+        <div class="note">Choose one or multiple languages. Search supported.</div>
+
+        <div class="dropdown">
+            <button type="button" class="dropdown-btn" onclick="toggleDropdown()">
+                Select Languages ▼
+            </button>
+
+            <div class="dropdown-content" id="dropdown">
+                <input type="text" id="dropdownSearch" class="dropdown-search" placeholder="Search languages...">
+
+                <div class="dropdown-actions">
+                    <button type="button" onclick="selectAllLanguages()">Select All</button>
+                    <button type="button" onclick="clearAllLanguages()">Clear All</button>
+                </div>
+
+                <div id="langList">
+                    {% for lang in languages %}
+                        <label class="dropdown-item">
+                            <input type="checkbox" name="languages" value="{{ lang }}">
+                            {{ lang }}
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- END DROPDOWN -->
+
+        <!-- FILES -->
+        <div class="section-title">2. Upload Script Files</div>
+        <input type="file" name="files" multiple accept=".txt">
+
+        <!-- TEXTAREA -->
+        <div class="section-title">3. Or Paste English Text</div>
+        <textarea name="text_input" placeholder="Paste your English script here..."></textarea>
+
+        <button type="submit">Translate & Download ZIP</button>
+    </form>
+</div>
+
+<!-- PREMIUM OVERLAY -->
+<div id="overlay" class="overlay hidden">
+    <div class="overlay-card">
+        <div style="display:flex; align-items:center;">
+            <div class="pulse-dot"></div>
+            <div id="overlayMainText">Starting...</div>
+        </div>
+
+        <div id="overlaySubText" style="font-size:12px;color:#9ca3af;margin-top:6px;">
+            Please wait while we translate your files.
+        </div>
+
+        <div class="progress-outer">
+            <div class="progress-inner" id="progressInner"></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; color:#9ca3af;">
+            <div id="progressLabel">0%</div>
+            <div id="etaLabel"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleDropdown() {
+        document.getElementById("dropdown").classList.toggle("show");
+    }
+
+    document.addEventListener("click", function (e) {
+        const box = document.getElementById("dropdown");
+        const btn = document.querySelector(".dropdown-btn");
+        if (!box.contains(e.target) && !btn.contains(e.target)) {
+            box.classList.remove("show");
+        }
+    });
+
+    const searchBox = document.getElementById("dropdownSearch");
+    const items = document.querySelectorAll(".dropdown-item");
+
+    searchBox.addEventListener("input", () => {
+        const val = searchBox.value.toLowerCase();
+        items.forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(val) ? "flex" : "none";
+        });
+    });
+
+    function selectAllLanguages() {
+        document.querySelectorAll("input[name='languages']").forEach(cb => cb.checked = true);
+    }
+
+    function clearAllLanguages() {
+        document.querySelectorAll("input[name='languages']").forEach(cb => cb.checked = false);
+    }
+
+    // ========================
+    // PREMIUM PROGRESS OVERLAY
+    // ========================
+    const overlay = document.getElementById("overlay");
+    const overlayMainText = document.getElementById("overlayMainText");
+    const overlaySubText = document.getElementById("overlaySubText");
+    const progressInner = document.getElementById("progressInner");
+    const progressLabel = document.getElementById("progressLabel");
+    const etaLabel = document.getElementById("etaLabel");
+    let pollInterval = null;
+
+    function showOverlay() { overlay.classList.remove("hidden"); }
+    function hideOverlay() { overlay.classList.add("hidden"); }
+
+    function startPolling(jobId) {
+        pollInterval = setInterval(() => {
+            fetch(`/progress/${jobId}`)
+                .then(res => res.json())
+                .then(data => {
+                    overlayMainText.textContent = data.message;
+                    progressInner.style.width = data.progress + "%";
+                    progressLabel.textContent = data.progress + "%";
+                    etaLabel.textContent = data.eta;
+
+                    if (data.status === "done") {
+                        clearInterval(pollInterval);
+                        window.location = `/download/${jobId}`;
+                        setTimeout(() => hideOverlay(), 2000);
+                    }
+                });
+        }, 1000);
+    }
+
+    document.getElementById("translateForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const langs = formData.getAll("languages");
+        if (langs.length === 0) return alert("Please select at least one language.");
+
+        showOverlay();
+
+        fetch("/start-translation", { method:"POST", body:formData })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "ok") startPolling(data.job_id);
+                else alert(data.message);
+            });
+    });
+</script>
+
+</body>
+</html>

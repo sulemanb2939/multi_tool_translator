@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Tools – Professional Utilities</title>
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #e3f2fd, #fce4ec);
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a237e, #4a148c);
+            color: #fff;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-weight: 600;
+            color: #333;
+        }
+
+        p {
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .tool-card {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: 0.3s ease;
+            border-left: 5px solid #673ab7;
+        }
+
+        .tool-card:hover {
+            background: #f3e5f5;
+            transform: translateY(-4px);
+        }
+
+        .tool-card h3 {
+            margin: 0 0 10px;
+            font-weight: 600;
+            color: #4a148c;
+        }
+
+        .tool-card p {
+            margin: 0 0 15px;
+        }
+
+        a.btn {
+            display: inline-block;
+            padding: 10px 18px;
+            background: #4a148c;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        a.btn:hover {
+            background: #6a1b9a;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>⚙️ My Professional Tools Hub</h1>
+</header>
+
+<div class="container">
+    <h2>Welcome to Your Tools Dashboard</h2>
+    <p>
+        Yeh page specially isliye banaya gaya hai taake aap apne daily kaam ko easy, fast
+        aur professional bana saken. Neeche diye gaye tools aapke workflow ko smooth karte hain.
+    </p>
+
+    <!-- Translator Tool -->
+    <div class="tool-card">
+        <h3>🌍 Multi-Language Script Translator</h3>
+        <p>
+            ✔ Ek saath multiple English files upload karein<br>
+            ✔ Multiple languages choose karein<br>
+            ✔ Har file sab selected languages me auto-translate hogi<br>
+            ✔ Saari translated files ek ZIP me download karein<br><br>
+            Yeh advanced translator large scripts, novels aur documents ke liye perfect hai.
+        </p>
+        <a class="btn" href="{{ url_for('translator') }}">Open Translator →</a>
+    </div>
+
+    <!-- Add more custom tool cards here if needed -->
+    
+</div>
+
+</body>
+</html>
