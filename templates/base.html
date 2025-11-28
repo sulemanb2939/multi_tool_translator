@@ -2,124 +2,154 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile Responsive -->
-    <title>My Tools – Professional Utilities</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tools – Professional Hub</title>
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            background: linear-gradient(180deg, #0f172a, #1e1b4b, #4a148c);
-            min-height: 100vh;
-            color: #e0e0e0;
+        :root {
+            --bg-main: #020617;
+            --bg-card: rgba(2, 6, 23, 0.75);
+            --border-color: rgba(148,163,184,0.3);
+            --text-main: #e5e7eb;
+            --text-muted: #94a3b8;
+            --accent-1: #38bdf8;
+            --accent-2: #6366f1;
+            --accent-3: #c084fc;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top left, #0b1120, #020617 55%, #000 100%);
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        /* HEADER */
         header {
-            background: rgba(15, 23, 42, 0.7);
-            padding: 25px;
-            text-align: center;
-            backdrop-filter: blur(6px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(2, 6, 23, 0.88);
+            backdrop-filter: blur(16px);
+            padding: 22px 18px;
+            border-bottom: 1px solid rgba(148,163,184,0.25);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.65);
+        }
+
+        .header-inner {
+            max-width: 1080px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         header h1 {
-            margin: 0;
-            font-weight: 600;
-            font-size: 24px;
-            color: #ffffff;
-            letter-spacing: 0.5px;
-        }
-
-        .container {
-            max-width: 950px;
-            margin: 30px auto;
-            padding: 20px;
-        }
-
-        .intro {
-            background: rgba(255,255,255,0.06);
-            padding: 20px 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 30px rgba(0,0,0,0.25);
-            margin-bottom: 25px;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .intro h2 {
-            margin-top: 0;
-            color: #ffffff;
-            font-weight: 600;
             font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #38bdf8, #6366f1, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
         }
 
-        .intro p {
-            color: #d1d5db;
+        /* MAIN WRAPPER */
+        .container {
+            max-width: 1080px;
+            margin: 40px auto;
+            padding: 0 18px;
+        }
+
+        /* INTRO CARD */
+        .intro-card {
+            padding: 22px 26px;
+            background: radial-gradient(circle at top right, rgba(56,189,248,0.12), rgba(99,102,241,0.12), rgba(2,6,23,0.88));
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 24px 55px rgba(0,0,0,0.85);
+            margin-bottom: 26px;
+        }
+
+        .intro-card h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-1);
+        }
+
+        .intro-card p {
+            margin-top: 10px;
+            font-size: 14px;
             line-height: 1.7;
-            margin: 10px 0 5px;
-            font-size: 15px;
+            color: var(--text-muted);
         }
 
+        /* TOOL CARD */
         .tool-card {
-            background: rgba(255,255,255,0.07);
-            border-radius: 14px;
-            padding: 20px;
-            margin-bottom: 18px;
-            border-left: 5px solid #7c3aed;
-            transition: 0.25s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-            backdrop-filter: blur(6px);
+            padding: 20px 22px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.8);
+            margin-bottom: 20px;
+            transition: 0.22s ease;
+            backdrop-filter: blur(12px);
         }
 
         .tool-card:hover {
             transform: translateY(-4px);
-            background: rgba(255,255,255,0.12);
+            background: rgba(2,6,23,0.92);
+            box-shadow: 0 22px 60px rgba(56,189,248,0.35);
         }
 
         .tool-card h3 {
-            margin: 0 0 8px;
-            color: #c084fc;
+            margin: 0 0 10px;
+            font-size: 18px;
             font-weight: 600;
+            color: var(--accent-3);
         }
 
         .tool-card p {
-            margin: 0 0 12px;
-            color: #e5e5e5;
+            margin: 0 0 16px;
             font-size: 14px;
             line-height: 1.6;
+            color: var(--text-muted);
         }
 
+        /* BUTTON */
         .btn {
             display: inline-block;
-            padding: 10px 18px;
+            padding: 10px 22px;
             background: linear-gradient(90deg, #0ea5e9, #6366f1);
             color: #fff;
             text-decoration: none;
             border-radius: 999px;
-            font-weight: 500;
+            font-weight: 600;
             font-size: 14px;
-            box-shadow: 0 0 25px rgba(56,189,248,0.4);
-            transition: 0.2s;
+            box-shadow: 0 16px 35px rgba(56,189,248,0.4);
+            transition: 0.2s ease;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(56,189,248,0.6);
+            box-shadow: 0 22px 45px rgba(56,189,248,0.6);
         }
 
-        /* MOBILE RESPONSIVE */
+        /* RESPONSIVE */
         @media (max-width: 600px) {
             header h1 {
                 font-size: 20px;
             }
-            .intro {
+            .intro-card {
                 padding: 18px 20px;
-            }
-            .intro h2 {
-                font-size: 18px;
             }
             .tool-card {
                 padding: 16px;
@@ -127,14 +157,12 @@
             .tool-card h3 {
                 font-size: 16px;
             }
-            .tool-card p {
-                font-size: 13px;
-            }
             .btn {
                 display: block;
+                width: 100%;
                 text-align: center;
-                width: 90%;
                 padding: 12px;
+                margin-top: 10px;
             }
         }
     </style>
@@ -143,18 +171,24 @@
 <body>
 
 <header>
-    <h1>⚙️ My Professional Tools Hub</h1>
+    <div class="header-inner">
+        <h1>⚙️ My Professional Tools Hub</h1>
+    </div>
 </header>
 
 <div class="container">
 
     <!-- Intro Section -->
-    <div class="intro">
-        <h2>Welcome to Your Tools Dashboard</h2>
+    <div class="intro-card">
+        <h2>Welcome to Professional Tools Dashboard</h2>
         <p>
-            Yeh page specially banaya gaya hai aapke daily workflows ko fast, smooth
-            aur professional banane ke liye. Neeche diye gaye tools aapko high-accuracy
-            and super-fast results dete hain.
+            Yeh dashboard specially design kiya gaya hai taake aap apne daily kaam ko
+            fast, smooth aur highly professional bana saken.  
+            Har tool lightning-fast speed aur premium accuracy provide karta hai.
+        </p>
+        <p>
+            Apni translation scripts, writing tasks, automation workflows — sab ko
+            ek hi jagah se manage karna ab super easy hai.
         </p>
     </div>
 
@@ -162,19 +196,23 @@
     <div class="tool-card">
         <h3>🌍 Multi-Language Script Translator</h3>
         <p>
-            ✔ Ek saath multiple English files upload karein<br>
-            ✔ Multiple languages choose karein<br>
-            ✔ Har file sab languages me auto-translate hogi<br>
-            ✔ Saara output ZIP file me download karein<br><br>
-            Large scripts, novels, documents ke liye best tool.
+            ✔ Multi-file upload support<br>
+            ✔ 90+ languages ready<br>
+            ✔ Auto-chunking for large scripts<br>
+            ✔ AI-powered fast translation<br>
+            ✔ ZIP export for your entire output<br><br>
+            Best for: novels, scripts, stories, documents, subtitles, etc.
         </p>
         <a class="btn" href="{{ url_for('translator') }}">Open Translator →</a>
     </div>
 
-    <!-- More tools can be added below -->
+    <!-- More Tools (future) -->
+    <!-- <div class="tool-card">
+        <h3>🚀 Coming Soon</h3>
+        <p>More advanced tools will appear here soon.</p>
+    </div> -->
+
 </div>
 
 </body>
 </html>
-
-
