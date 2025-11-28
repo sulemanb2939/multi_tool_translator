@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile Responsive -->
     <title>My Tools – Professional Utilities</title>
 
     <!-- Google Font -->
@@ -12,10 +12,9 @@
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
-            padding: 0;
             background: linear-gradient(180deg, #0f172a, #1e1b4b, #4a148c);
-            color: #e0e0e0;
             min-height: 100vh;
+            color: #e0e0e0;
         }
 
         header {
@@ -45,13 +44,13 @@
             padding: 20px 25px;
             border-radius: 12px;
             box-shadow: 0 4px 30px rgba(0,0,0,0.25);
+            margin-bottom: 25px;
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255,255,255,0.08);
-            margin-bottom: 25px;
         }
 
         .intro h2 {
-            margin: 0 0 8px;
+            margin-top: 0;
             color: #ffffff;
             font-weight: 600;
             font-size: 22px;
@@ -59,62 +58,56 @@
 
         .intro p {
             color: #d1d5db;
-            font-size: 15px;
             line-height: 1.7;
+            margin: 10px 0 5px;
+            font-size: 15px;
         }
 
         .tool-card {
             background: rgba(255,255,255,0.07);
             border-radius: 14px;
-            padding: 20px 18px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 18px;
             border-left: 5px solid #7c3aed;
+            transition: 0.25s ease;
             box-shadow: 0 4px 20px rgba(0,0,0,0.25);
             backdrop-filter: blur(6px);
-            transition: 0.25s ease;
         }
 
         .tool-card:hover {
-            background: rgba(255,255,255,0.12);
             transform: translateY(-4px);
+            background: rgba(255,255,255,0.12);
         }
 
         .tool-card h3 {
-            margin: 0 0 10px;
+            margin: 0 0 8px;
             color: #c084fc;
             font-weight: 600;
-            font-size: 18px;
         }
 
         .tool-card p {
-            margin: 0 0 14px;
+            margin: 0 0 12px;
             color: #e5e5e5;
             font-size: 14px;
             line-height: 1.6;
         }
 
         .btn {
-            display: block;
-            width: 100%;
-            text-align: center;
-            padding: 12px;
-            margin-top: 15px;
-
+            display: inline-block;
+            padding: 10px 18px;
             background: linear-gradient(90deg, #0ea5e9, #6366f1);
             color: #fff;
-
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 999px;
             font-weight: 500;
-            font-size: 15px;
-
-            box-shadow: 0 4px 20px rgba(56,189,248,0.35);
-            transition: all 0.2s ease;
+            font-size: 14px;
+            box-shadow: 0 0 25px rgba(56,189,248,0.4);
+            transition: 0.2s;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(56,189,248,0.5);
+            box-shadow: 0 0 30px rgba(56,189,248,0.6);
         }
 
         /* MOBILE RESPONSIVE */
@@ -138,10 +131,10 @@
                 font-size: 13px;
             }
             .btn {
-                padding: 14px;
-                font-size: 16px;
-                border-radius: 12px;
-                margin-top: 18px;
+                display: block;
+                text-align: center;
+                width: 100%;
+                padding: 12px;
             }
         }
     </style>
@@ -161,11 +154,11 @@
         <p>
             Yeh page specially banaya gaya hai aapke daily workflows ko fast, smooth
             aur professional banane ke liye. Neeche diye gaye tools aapko high-accuracy
-            aur super-fast results dete hain.
+            and super-fast results dete hain.
         </p>
     </div>
 
-    <!-- Translator Tool Box -->
+    <!-- Translator Tool -->
     <div class="tool-card">
         <h3>🌍 Multi-Language Script Translator</h3>
         <p>
@@ -175,10 +168,10 @@
             ✔ Saara output ZIP file me download karein<br><br>
             Large scripts, novels, documents ke liye best tool.
         </p>
-
         <a class="btn" href="{{ url_for('translator') }}">Open Translator →</a>
     </div>
 
+    <!-- More tools can be added below -->
 </div>
 
 </body>
