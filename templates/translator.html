@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!-- MOBILE FIX -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Language Translator</title>
 
     <style>
@@ -34,8 +34,6 @@
             border: 1px solid #1e293b;
         }
 
-        label { display: block; margin-top: 10px; font-weight: 600; }
-
         textarea {
             width: 100%;
             height: 160px;
@@ -62,14 +60,10 @@
             border-radius: 999px;
             cursor: pointer;
             font-weight: 600;
-            width: 100%; /* MOBILE FIX */
+            width: 100%;
             font-size: 16px;
-            letter-spacing: 0.3px;
             box-shadow: 0 10px 30px rgba(56,189,248,0.35);
         }
-
-        .section-title { font-size: 18px; margin-bottom: 6px; }
-        .note { font-size: 0.85em; color: #9ca3af; }
 
         /* DROPDOWN */
         .dropdown { position: relative; margin-bottom: 20px; width: 100%; }
@@ -83,6 +77,7 @@
             color: #e5e7eb;
             font-size: 16px;
             text-align: left;
+            cursor: pointer;
         }
 
         .dropdown-content {
@@ -93,7 +88,7 @@
             border: 1px solid #1e293b;
             padding: 10px;
             display: none;
-            max-height: 260px;
+            max-height: 280px;
             overflow-y: auto;
             z-index: 9999;
         }
@@ -110,6 +105,16 @@
             margin-bottom: 10px;
         }
 
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 6px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover { background: #1e293b; }
+
         .dropdown-actions {
             display: flex;
             justify-content: space-between;
@@ -123,19 +128,10 @@
             background: #020617;
             color: #e5e7eb;
             font-size: 12px;
+            cursor: pointer;
         }
 
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            padding: 6px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .dropdown-item:hover { background: #1e293b; }
-
-        /* PROGRESS OVERLAY */
+        /* OVERLAY */
         .overlay {
             position: fixed;
             inset: 0;
@@ -181,17 +177,6 @@
             from { background-position: 0% 50%; }
             to { background-position: 100% 50%; }
         }
-
-        /* MOBILE BREAKPOINTS */
-        @media (max-width: 600px) {
-            header h1 { font-size: 18px; }
-            .container { padding: 15px; margin: 15px; }
-            .section-title { font-size: 16px; }
-            textarea { height: 140px; font-size: 14px; }
-            .dropdown-btn { font-size: 15px; padding: 12px; }
-            .dropdown-item { font-size: 13px; }
-            button { font-size: 15px; padding: 10px 18px; }
-        }
     </style>
 </head>
 
@@ -208,15 +193,16 @@
 
     <form id="translateForm">
 
+        <!-- LANGUAGE SECTION -->
         <div class="section-title">1. Select Target Languages</div>
         <div class="note">Choose one or multiple languages.</div>
 
         <div class="dropdown">
-            <button type="button" class="dropdown-btn" onclick="toggleDropdown()">Select Languages ▼</button>
+            <button type="button" class="dropdown-btn" id="dropdownToggle">Select Languages ▼</button>
 
-            <div class="dropdown-content" id="dropdown">
+            <div class="dropdown-content" id="dropdownMenu">
 
-                <input type="text" id="dropdownSearch" class="dropdown-search" placeholder="Search...">
+                <input type="text" id="dropdownSearch" class="dropdown-search" placeholder="Search languages...">
 
                 <div class="dropdown-actions">
                     <button type="button" onclick="selectAllLanguages()">Select All</button>
@@ -232,12 +218,20 @@
                     {% endfor %}
                 </div>
 
+                <!-- DONE BUTTON -->
+                <button type="button" id="closeDropdownBtn"
+                    style="margin-top:12px; width:100%; padding:10px; background:#1e293b; color:#fff; border-radius:8px; border:none;">
+                    Done ✔
+                </button>
+
             </div>
         </div>
 
+        <!-- FILE UPLOAD -->
         <div class="section-title">2. Upload Script Files</div>
-        <input type="file" name="files" multiple accept=".txt" style="margin-bottom: 10px; width:100%;">
+        <input type="file" name="files" multiple accept=".txt" style="width:100%; margin-bottom:10px;">
 
+        <!-- TEXT INPUT -->
         <div class="section-title">3. Or Paste English Text</div>
         <textarea name="text_input" placeholder="Paste your English script here..."></textarea>
 
@@ -250,7 +244,7 @@
 <div id="overlay" class="overlay hidden">
     <div class="overlay-card">
         <div style="display:flex; align-items:center;">
-            <div class="pulse-dot" style="margin-right:8px;"></div>
+            <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;margin-right:8px;"></div>
             <div id="overlayMainText">Starting...</div>
         </div>
 
@@ -268,37 +262,42 @@
 </div>
 
 <script>
-    function toggleDropdown() {
-        document.getElementById("dropdown").classList.toggle("show");
-    }
+/* DROPDOWN TOGGLE */
+const toggleBtn = document.getElementById("dropdownToggle");
+const dropdownMenu = document.getElementById("dropdownMenu");
 
-    document.addEventListener("click", (e) => {
-        const box = document.getElementById("dropdown");
-        const btn = document.querySelector(".dropdown-btn");
-        if (!box.contains(e.target) && !btn.contains(e.target)) {
-            box.classList.remove("show");
-        }
+toggleBtn.addEventListener("click", () => {
+    dropdownMenu.classList.toggle("show");
+});
+
+/* CLOSE ON OUTSIDE CLICK */
+document.addEventListener("click", function (e) {
+    if (!dropdownMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
+        dropdownMenu.classList.remove("show");
+    }
+});
+
+/* SEARCH */
+document.getElementById("dropdownSearch").addEventListener("input", () => {
+    let val = dropdownSearch.value.toLowerCase();
+    document.querySelectorAll(".dropdown-item").forEach(item => {
+        item.style.display = item.textContent.toLowerCase().includes(val) ? "flex" : "none";
     });
+});
 
-    const searchBox = document.getElementById("dropdownSearch");
-    const items = document.querySelectorAll(".dropdown-item");
+/* SELECT ALL / CLEAR ALL */
+function selectAllLanguages() {
+    document.querySelectorAll("input[name='languages']").forEach(cb => cb.checked = true);
+}
+function clearAllLanguages() {
+    document.querySelectorAll("input[name='languages']").forEach(cb => cb.checked = false);
+}
 
-    searchBox.addEventListener("input", () => {
-        const val = searchBox.value.toLowerCase();
-        items.forEach(item => {
-            item.style.display = item.textContent.toLowerCase().includes(val) ? "flex" : "none";
-        });
-    });
-
-    function selectAllLanguages() {
-        document.querySelectorAll("input[name='languages']").forEach(cb => cb.checked = true);
-    }
-
-    function clearAllLanguages() {
-        document.querySelectorAll("input[name='languages']").forEach(cb => cb.checked = false);
-    }
+/* DONE BUTTON */
+document.getElementById("closeDropdownBtn").addEventListener("click", () => {
+    dropdownMenu.classList.remove("show");
+});
 </script>
 
 </body>
 </html>
-
