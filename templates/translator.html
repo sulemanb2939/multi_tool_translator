@@ -67,16 +67,81 @@
         /* overlay */
         .overlay{position:fixed;inset:0;background:radial-gradient(circle at top, rgba(56,189,248,0.08), rgba(15,23,42,0.98));display:flex;align-items:center;justify-content:center;z-index:9999;padding:12px}
         .overlay.hidden{display:none}
-        .overlay-card{width:420px;max-width:100%;background:#020617;border-radius:14px;padding:16px;box-shadow:0 24px 70px rgba(0,0,0,0.9);border:1px solid rgba(148,163,184,0.2)}
+        .overlay-card{width:420px;max-width:100%;background:#020617;border-radius:14px;padding:16px;box-shadow:0 24px 70px rgba(0,0,0,0.9);border:1px solid rgba(148,163,184,0.2);position:relative}
+
+        /* CLOSE BUTTON — Neon Red Glow */
+.overlay-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #fca5a5;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.85;
+    transition: 0.18s ease;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: rgba(127,29,29,0.15);
+    border: 1px solid rgba(248,113,113,0.35);
+    box-shadow: 0 2px 10px rgba(248,113,113,0.2);
+}
+
+.overlay-close:hover {
+    opacity: 1;
+    transform: scale(1.12);
+    background: rgba(127,29,29,0.25);
+    border-color: rgba(248,113,113,0.6);
+    box-shadow: 0 4px 16px rgba(248,113,113,0.35);
+}
+
+/* CANCEL TRANSLATION BUTTON — Premium Red Gradient */
+.cancel-btn {
+    margin-top: 14px;
+    width: 100%;
+    padding: 10px 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffe4e6;
+    border-radius: 999px;
+    cursor: pointer;
+
+    background: linear-gradient(120deg,
+        rgba(239,68,68,0.75),
+        rgba(190,18,60,0.85),
+        rgba(127,29,29,0.9)
+    );
+    background-size: 220% 100%;
+
+    border: 1px solid rgba(248,113,113,0.55);
+    box-shadow: 0 10px 28px rgba(190,18,60,0.45);
+
+    transition: 0.25s ease;
+}
+
+.cancel-btn:hover {
+    background-position: 100% 0;
+    border-color: rgba(248,113,113,0.9);
+    box-shadow: 0 12px 38px rgba(239,68,68,0.60);
+    transform: translateY(-1px);
+}
+
+.cancel-btn:active {
+    transform: translateY(0px);
+    box-shadow: 0 6px 18px rgba(239,68,68,0.4);
+}
+
+
         .overlay-title{display:flex;gap:10px;align-items:center;margin-bottom:8px}
         .pulse-dot{width:10px;height:10px;border-radius:999px;background:#22c55e;animation:pulse 1.3s infinite}
         @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,0.8)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
-        .progress-outer{width:100%;height:14px;background:#020617;border-radius:999px;border:1px solid #1e293b;overflow:hidden}
+        .progress-outer{width:100%;height:14px;background:#020617;border-radius:999px;border:1px solid #1e293b;overflow:hidden;margin-top:8px}
         .progress-inner{height:100%;width:0%;border-radius:inherit;background-image:linear-gradient(90deg,#0ea5e9,#6366f1,#22c55e);background-size:200% 100%;animation:progressGradient 1s linear infinite}
         @keyframes progressGradient{0%{background-position:0 50%}100%{background-position:100% 50%}}
-        .overlay-footer{display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:13px}
 
-        /* outputs */
+        .overlay-footer{display:flex;justify-content:space-between;margin-top:6px;color:var(--muted);font-size:14px}
+        /* OUTPUT CARDS */
         .outputs{margin-top:18px;display:grid;gap:12px}
         .output-card{background:linear-gradient(180deg, rgba(15,23,42,0.9), rgba(2,6,23,0.9));border:1px solid rgba(30,41,59,0.9);padding:10px;border-radius:12px;position:relative}
         .output-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
@@ -96,6 +161,7 @@
         }
     </style>
 </head>
+
 <body>
 <header>
     <div class="header-inner">
@@ -117,6 +183,8 @@
     {% endwith %}
 
     <form id="translateForm">
+
+        <!-- LANGUAGES -->
         <div style="margin-bottom:16px">
             <div class="section-title">1. Select Target Languages</div>
             <div class="note">Choose one or multiple languages. Use search to filter.</div>
@@ -156,25 +224,27 @@
             </div>
         </div>
 
+        <!-- FILE UPLOAD -->
         <div style="margin-top:10px">
             <div class="section-title">2. Upload English Script Files</div>
-            <div class="note">You can upload multiple .txt files. Each will be translated into all selected languages.</div>
-            <input type="file" name="files" multiple accept=".txt">
+            <div class="note">Upload multiple text files. Each will be translated to every selected language.</div>
+            <input type="file" name="files" multiple accept=".txt" />
         </div>
 
+        <!-- TEXT INPUT -->
         <div style="margin-top:16px">
-            <div class="section-title">3. Or paste English text (optional)</div>
-            <div class="note">If you paste text here, it'll also be translated like a separate file.</div>
-            <textarea name="text_input" placeholder="Paste your English script here (optional)…"></textarea>
+            <div class="section-title">3. Or paste English text</div>
+            <div class="note">Optional: Paste plain English text to translate it like a file.</div>
+            <textarea name="text_input" placeholder="Paste your English script here…"></textarea>
         </div>
 
-        <button type="submit" class="primary-btn">Translate & Prepare</button>
+        <button class="primary-btn" type="submit">Translate & Prepare</button>
     </form>
 
-    <!-- OUTPUTS -->
-    <div style="margin-top:18px;">
+    <!-- OUTPUT SECTION -->
+    <div style="margin-top:20px;">
         <div class="section-title">4. Translation Output</div>
-        <div class="note">Results will appear below after the job completes. You can Show Outputs (view & copy), Download individual .txt, or Download ZIP (server).</div>
+        <div class="note">After translation, view outputs, copy text, download .txt files or download ZIP.</div>
 
         <div class="controls-row" id="topControls">
             <button id="showOutputsBtn" class="btn-small" style="display:none">Show Outputs</button>
@@ -190,11 +260,15 @@
 <!-- OVERLAY -->
 <div id="overlay" class="overlay hidden" aria-hidden="true">
     <div class="overlay-card">
+
+        <!-- CLOSE BUTTON (❌) -->
+        <div class="overlay-close" id="overlayCloseBtn">✕</div>
+
         <div class="overlay-title">
-            <div class="pulse-dot" aria-hidden="true"></div>
+            <div class="pulse-dot"></div>
             <div>
                 <div id="overlayMainText" style="font-weight:600">Preparing job…</div>
-                <div id="overlaySubText" style="color:var(--muted);font-size:13px">Please keep this tab open while we translate your files.</div>
+                <div id="overlaySubText" style="color:var(--muted);font-size:13px">Please keep this tab open while translating…</div>
             </div>
         </div>
 
@@ -206,15 +280,21 @@
             <div id="progressLabel">0%</div>
             <div id="etaLabel"></div>
         </div>
+
+        <!-- CANCEL BUTTON -->
+        <button id="cancelBtn" class="cancel-btn">Cancel Translation</button>
     </div>
 </div>
 
-<!-- deps -->
+<!-- JSZip + FileSaver -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 <script>
-    // Elements
+    ////////////////////////////////////////
+    //  DROPDOWN LANGUAGE MENU
+    ////////////////////////////////////////
+
     const dropdownToggle = document.getElementById('dropdownToggle');
     const dropdownPanel = document.getElementById('dropdownPanel');
     const dropdownSearch = document.getElementById('dropdownSearch');
@@ -225,238 +305,340 @@
     const selectedCount = document.getElementById('selectedCount');
     const dropdownLabel = document.getElementById('dropdownLabel');
 
+    function updateSelectedSummary(){
+        const checked = langList.querySelectorAll("input[name='languages']:checked");
+        const count = checked.length;
+        selectedCount.textContent = count + " selected";
+
+        if(count === 0){
+            dropdownLabel.textContent = "Select languages";
+        } else if(count === 1){
+            dropdownLabel.textContent = checked[0].value;
+        } else if(count <= 3){
+            dropdownLabel.textContent = Array.from(checked).map(cb=>cb.value).join(", ");
+        } else {
+            dropdownLabel.textContent = checked[0].value + " +" + (count-1);
+        }
+    }
+
+    dropdownToggle.addEventListener('click', ()=> {
+        dropdownPanel.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e)=>{
+        if(!dropdownPanel.contains(e.target) && !dropdownToggle.contains(e.target)){
+            dropdownPanel.classList.remove('show');
+        }
+    });
+
+    dropdownSearch.addEventListener('input', ()=> {
+        const term = dropdownSearch.value.toLowerCase();
+        const items = langList.querySelectorAll('.dropdown-item');
+        items.forEach(it => {
+            it.style.display = it.textContent.toLowerCase().includes(term) ? 'flex' : 'none';
+        });
+    });
+
+    selectAllBtn.addEventListener('click', ()=>{
+        langList.querySelectorAll("input[name='languages']").forEach(cb => cb.checked = true);
+        updateSelectedSummary();
+    });
+
+    clearAllBtn.addEventListener('click', ()=>{
+        langList.querySelectorAll("input[name='languages']").forEach(cb => cb.checked = false);
+        updateSelectedSummary();
+    });
+
+    langList.addEventListener('change', updateSelectedSummary);
+    doneBtn.addEventListener('click', ()=>{
+        dropdownPanel.classList.remove('show');
+        updateSelectedSummary();
+    });
+
+
+    ////////////////////////////////////////
+    //  OVERLAY + CANCEL + CLOSE BUTTON
+    ////////////////////////////////////////
+
     const overlay = document.getElementById('overlay');
     const overlayMainText = document.getElementById('overlayMainText');
     const overlaySubText = document.getElementById('overlaySubText');
     const progressInner = document.getElementById('progressInner');
     const progressLabel = document.getElementById('progressLabel');
     const etaLabel = document.getElementById('etaLabel');
-
-    const translateForm = document.getElementById('translateForm');
-    const outputsEl = document.getElementById('outputs');
-    const outputsMeta = document.getElementById('outputsMeta');
-    const showOutputsBtn = document.getElementById('showOutputsBtn');
-    const serverDownloadLink = document.getElementById('serverDownloadLink');
-    const downloadAllZipBtn = document.getElementById('downloadAllZipBtn');
+    const overlayCloseBtn = document.getElementById('overlayCloseBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
 
     let pollInterval = null;
     let currentJobId = null;
-    let lastServerZipFetched = null; // Blob from server (if user fetches it)
-    let parsedTranslations = []; // [{ name: 'file_Urdu.txt', lang:'Urdu', text:'...' }]
+    let cancelRequested = false;
 
-    // Dropdown logic
-    function updateSelectedSummary(){
-        const checked = langList.querySelectorAll("input[name='languages']:checked");
-        const count = checked.length;
-        selectedCount.textContent = count + " selected";
-        if(count === 0) dropdownLabel.textContent = "Select languages";
-        else if(count === 1) dropdownLabel.textContent = checked[0].value;
-        else if(count <= 3) dropdownLabel.textContent = Array.from(checked).map(c=>c.value).join(", ");
-        else dropdownLabel.textContent = checked[0].value + " +" + (count-1);
+    // Add basic close button style (auto-apply if not present)
+    const styleClose = document.createElement("style");
+    styleClose.innerHTML = `
+        .overlay-close{
+            position:absolute;
+            top:10px;
+            right:12px;
+            font-size:18px;
+            color:#f87171;
+            cursor:pointer;
+            opacity:0.7;
+            user-select:none;
+            transition:0.15s;
+        }
+        .overlay-close:hover{opacity:1}
+
+        .cancel-btn{
+            margin-top:12px;
+            width:100%;
+            background:#7f1d1d;
+            border:1px solid #f87171;
+            color:#fca5a5;
+            padding:8px 0;
+            border-radius:999px;
+            cursor:pointer;
+            font-size:13px;
+        }
+        .cancel-btn:hover{
+            filter:brightness(1.2);
+        }
+    `;
+    document.head.appendChild(styleClose);
+
+
+    function showOverlay(){
+        overlay.classList.remove('hidden');
+        progressInner.style.width = "0%";
+        progressLabel.textContent = "0%";
+        etaLabel.textContent = "";
+        overlayMainText.textContent = "Starting translation…";
+        overlaySubText.textContent = "Please wait. Processing…";
     }
-    dropdownToggle.addEventListener('click', ()=> dropdownPanel.classList.toggle('show'));
-    document.addEventListener('click', (e)=>{ if(!dropdownPanel.contains(e.target) && !dropdownToggle.contains(e.target)) dropdownPanel.classList.remove('show'); });
-    dropdownSearch.addEventListener('input', ()=> {
-        const term = dropdownSearch.value.toLowerCase();
-        const items = langList.querySelectorAll('.dropdown-item');
-        items.forEach(it => { it.style.display = it.textContent.toLowerCase().includes(term) ? 'flex' : 'none' });
+
+    function hideOverlay(){
+        overlay.classList.add('hidden');
+    }
+
+    // CLOSE (❌)
+    overlayCloseBtn.addEventListener('click', ()=>{
+        hideOverlay();
     });
-    selectAllBtn.addEventListener('click', ()=> { langList.querySelectorAll("input[name='languages']").forEach(cb=>cb.checked=true); updateSelectedSummary(); });
-    clearAllBtn.addEventListener('click', ()=> { langList.querySelectorAll("input[name='languages']").forEach(cb=>cb.checked=false); updateSelectedSummary(); });
-    langList.addEventListener('change', updateSelectedSummary);
-    doneBtn.addEventListener('click', ()=> { dropdownPanel.classList.remove('show'); updateSelectedSummary(); });
 
-    // Overlay helpers
-    function showOverlay(){ overlay.classList.remove('hidden'); overlay.setAttribute('aria-hidden','false'); progressInner.style.width='0%'; progressLabel.textContent='0%'; etaLabel.textContent=''; overlayMainText.textContent='Starting translation...'; overlaySubText.textContent = 'Please keep this tab open.' }
-    function hideOverlay(){ overlay.classList.add('hidden'); overlay.setAttribute('aria-hidden','true') }
+    // CANCEL BUTTON
+    cancelBtn.addEventListener('click', ()=>{
+        cancelRequested = true;
+        overlayMainText.textContent = "Cancelling job…";
+        overlaySubText.textContent = "Please wait…";
+    });
 
-    // Polling progress
+
+    ////////////////////////////////////////
+    //   POLLING PROGRESS
+    ////////////////////////////////////////
+
     function startPolling(jobId){
+        currentJobId = jobId;
+        cancelRequested = false;
+
         if(pollInterval) clearInterval(pollInterval);
+
         pollInterval = setInterval(()=>{
+            if(cancelRequested){
+                clearInterval(pollInterval);
+                overlayMainText.textContent = "Cancelled!";
+                overlaySubText.textContent = "You stopped the translation.";
+                setTimeout(()=> hideOverlay(), 1500);
+                return;
+            }
+
             fetch(`/progress/${jobId}`)
             .then(r=>r.json())
             .then(data=>{
                 if(!data) return;
+
                 const status = data.status || '';
                 const prog = data.progress || 0;
-                overlayMainText.textContent = data.message || 'Translating...';
-                progressInner.style.width = prog + '%';
-                progressLabel.textContent = prog + '%';
-                etaLabel.textContent = data.eta || '';
 
-                if(status === 'done' || prog >= 100){
+                overlayMainText.textContent = data.message || "Translating…";
+                progressInner.style.width = prog + "%";
+                progressLabel.textContent = prog + "%";
+                etaLabel.textContent = data.eta || "";
+
+                if(status === "done" || prog >= 100){
                     clearInterval(pollInterval);
-                    overlayMainText.textContent = 'Completed!';
-                    overlaySubText.textContent = 'Job completed. Use "Show Outputs" to view, or download ZIP.';
-                    progressInner.style.width = '100%';
-                    progressLabel.textContent = '100%';
-                    currentJobId = jobId;
-                    // show download/show buttons (user must click)
-                    showOutputsBtn.style.display = 'inline-block';
-                    serverDownloadLink.style.display = 'inline-block';
-                    serverDownloadLink.href = `/download/${jobId}`;
-                    serverDownloadLink.textContent = 'Download ZIP (Server)';
-                    outputsMeta.textContent = 'Job finished. Click "Show Outputs" to view the translated files (optional).';
-                    downloadAllZipBtn.style.display = 'inline-block';
+
+                    overlayMainText.textContent = "Completed!";
+                    overlaySubText.textContent = "Click 'Show Outputs' to view results.";
+
+                    progressInner.style.width = "100%";
+                    progressLabel.textContent = "100%";
+
+                    // Show UI buttons
+                    document.getElementById("showOutputsBtn").style.display = "inline-block";
+                    document.getElementById("serverDownloadLink").style.display = "inline-block";
+                    document.getElementById("serverDownloadLink").href = `/download/${jobId}`;
+                    document.getElementById("downloadAllZipBtn").style.display = "inline-block";
+
                     hideOverlay();
                 }
             })
-            .catch(err=> {
-                console.error('progress error', err);
-            })
+            .catch(err=> console.error("Polling error", err));
         }, 1100);
     }
 
-    // Render parsed translations array -> UI
+
+    ////////////////////////////////////////
+    //    ZIP PARSING + OUTPUT RENDERING
+    ////////////////////////////////////////
+
+    const outputsEl = document.getElementById("outputs");
+    const outputsMeta = document.getElementById("outputsMeta");
+    const showOutputsBtn = document.getElementById("showOutputsBtn");
+    const serverDownloadLink = document.getElementById("serverDownloadLink");
+    const downloadAllZipBtn = document.getElementById("downloadAllZipBtn");
+
+    let parsedTranslations = [];
+
     function renderTranslations(list){
         parsedTranslations = list.slice();
-        outputsEl.innerHTML = '';
-        if(!list || list.length===0){
-            outputsMeta.textContent = 'No translation files found in ZIP.';
+        outputsEl.innerHTML = "";
+
+        if(list.length === 0){
+            outputsMeta.textContent = "No translated files found.";
             return;
         }
-        list.forEach(item=>{
-            const name = item.name || item.filename || 'file.txt';
-            const text = item.text || '';
-            // attempt to derive language from filename (file_lang.txt) often in our zip
-            const parts = name.replace(/\.[^/.]+$/, '').split('_');
-            let lang = parts.length>1 ? parts[parts.length-1] : name;
-            // UI card
-            const card = document.createElement('div'); card.className = 'output-card';
-            const header = document.createElement('div'); header.className='output-header';
-            const langEl = document.createElement('div'); langEl.className='output-lang'; langEl.textContent = lang;
-            const actions = document.createElement('div'); actions.className='output-actions';
 
-            const copyBtn = document.createElement('button'); copyBtn.className='btn-small'; copyBtn.textContent='Copy';
-            copyBtn.onclick = ()=> {
-                navigator.clipboard.writeText(text).then(()=>{ copyBtn.textContent='Copied'; setTimeout(()=>copyBtn.textContent='Copy',1200) }).catch(()=>alert('Copy failed'));
+        list.forEach(item=>{
+            const card = document.createElement("div");
+            card.className = "output-card";
+
+            const header = document.createElement("div");
+            header.className = "output-header";
+
+            const langName = document.createElement("div");
+            langName.className = "output-lang";
+            langName.textContent = item.name.replace(".txt","");
+
+            const actions = document.createElement("div");
+            actions.className = "output-actions";
+
+            const copyBtn = document.createElement("button");
+            copyBtn.className = "btn-small";
+            copyBtn.textContent = "Copy";
+            copyBtn.onclick = ()=>{
+                navigator.clipboard.writeText(item.text)
+                    .then(()=>{
+                        copyBtn.textContent = "Copied!";
+                        setTimeout(()=> copyBtn.textContent = "Copy", 1200);
+                    });
             };
 
-            const dlBtn = document.createElement('button'); dlBtn.className='btn-small'; dlBtn.textContent='Download .txt';
+            const dlBtn = document.createElement("button");
+            dlBtn.className = "btn-small";
+            dlBtn.textContent = "Download .txt";
             dlBtn.onclick = ()=>{
-                const filename = name;
-                const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-                saveAs(blob, filename);
+                const blob = new Blob([item.text], {type:"text/plain;charset=utf-8"});
+                saveAs(blob, item.name);
             };
 
             actions.appendChild(copyBtn);
             actions.appendChild(dlBtn);
-            header.appendChild(langEl);
+
+            header.appendChild(langName);
             header.appendChild(actions);
 
-            const ta = document.createElement('textarea'); ta.className='output-textarea'; ta.readOnly=true; ta.value=text;
+            const ta = document.createElement("textarea");
+            ta.className = "output-textarea";
+            ta.readOnly = true;
+            ta.value = item.text;
 
             card.appendChild(header);
             card.appendChild(ta);
             outputsEl.appendChild(card);
         });
-        outputsMeta.textContent = `${list.length} file(s) extracted from ZIP.`;
+
+        outputsMeta.textContent = `${list.length} output file(s) ready.`;
     }
 
-    // Fetch server ZIP and parse with JSZip (user action)
-    async function fetchAndParseZip(jobId){
-        if(!jobId) return alert('No job id available');
-        showOutputsBtn.textContent = 'Loading…';
-        showOutputsBtn.disabled = true;
+    async function fetchZip(jobId){
+        showOutputsBtn.textContent = "Loading…";
         try{
             const res = await fetch(`/download/${jobId}`);
-            if(!res.ok) {
-                const j = await res.json().catch(()=>({message:'Server download failed'}));
-                alert(j.message || 'Could not fetch ZIP from server.');
-                return;
-            }
             const blob = await res.blob();
-            lastServerZipFetched = blob; // keep for potential re-download or repack
+
             const zip = await JSZip.loadAsync(blob);
-            const files = [];
-            const entries = Object.keys(zip.files);
-            for(const fname of entries){
-                const fileObj = zip.files[fname];
-                if(fileObj.dir) continue;
-                const content = await fileObj.async('string');
-                files.push({name: fname, text: content});
+            const items = [];
+
+            for(const filename of Object.keys(zip.files)){
+                const file = zip.files[filename];
+                if(!file.dir){
+                    const text = await file.async("string");
+                    items.push({name:filename, text});
+                }
             }
-            renderTranslations(files);
-        }catch(err){
-            console.error('zip fetch/parse error', err);
-            alert('Could not fetch or read ZIP. See console.');
-        }finally{
-            showOutputsBtn.textContent = 'Show Outputs';
-            showOutputsBtn.disabled = false;
+
+            renderTranslations(items);
+        }catch(e){
+            alert("Failed to load ZIP");
         }
+        showOutputsBtn.textContent = "Show Outputs";
     }
 
-    // Download all as ZIP (repack from parsedTranslations)
-    async function downloadAllAsZip(){
+    showOutputsBtn.addEventListener("click", ()=>{
+        if(!currentJobId) return alert("No job found.");
+        fetchZip(currentJobId);
+    });
+
+    downloadAllZipBtn.addEventListener("click", async ()=>{
         if(parsedTranslations.length === 0){
-            alert('No outputs available to pack. Click "Show Outputs" first.');
+            alert("No outputs available");
             return;
         }
-        downloadAllZipBtn.textContent = 'Preparing ZIP…'; downloadAllZipBtn.disabled = true;
-        try{
-            const zip = new JSZip();
-            parsedTranslations.forEach(f => {
-                zip.file(f.name, f.text || '');
-            });
-            const blob = await zip.generateAsync({type:'blob'});
-            saveAs(blob, 'translations_repacked.zip');
-        }catch(err){
-            console.error('zip pack error', err);
-            alert('Could not create ZIP.');
-        }finally{
-            downloadAllZipBtn.textContent = 'Download All as ZIP'; downloadAllZipBtn.disabled = false;
-        }
-    }
+        const zip = new JSZip();
+        parsedTranslations.forEach(f=>{
+            zip.file(f.name, f.text);
+        });
+        const blob = await zip.generateAsync({type:"blob"});
+        saveAs(blob, "translations_all_local.zip");
+    });
 
-    // Form submit -> start translation
-    translateForm.addEventListener('submit', function(e){
+
+    ////////////////////////////////////////
+    //  SUBMIT FORM -> START JOB
+    ////////////////////////////////////////
+
+    document.getElementById("translateForm").addEventListener("submit", function(e){
         e.preventDefault();
-        const fd = new FormData(translateForm);
-        const langs = fd.getAll('languages');
-        if(!langs || langs.length === 0){
-            alert('Please select at least one language.');
-            return;
+
+        const fd = new FormData(this);
+        const langs = fd.getAll("languages");
+        if(langs.length === 0){
+            return alert("Please select at least one language.");
         }
-        // clear previous UI
-        outputsEl.innerHTML=''; parsedTranslations=[]; lastServerZipFetched=null;
-        outputsMeta.textContent = 'Starting job…';
-        showOutputsBtn.style.display='none'; serverDownloadLink.style.display='none'; downloadAllZipBtn.style.display='none';
+
+        outputsEl.innerHTML = "";
+        parsedTranslations = [];
+        outputsMeta.textContent = "Starting translation…";
+        showOutputsBtn.style.display = "none";
+        serverDownloadLink.style.display = "none";
+        downloadAllZipBtn.style.display = "none";
 
         showOverlay();
-        fetch('/start-translation', { method:'POST', body: fd })
+
+        fetch("/start-translation", {method:"POST", body:fd})
         .then(r=>r.json())
         .then(data=>{
-            if(!data) throw new Error('No response');
-            if(data.status === 'ok' && data.job_id){
-                const id = data.job_id;
-                currentJobId = id;
-                overlayMainText.textContent = 'Job started...';
-                startPolling(id);
+            if(data.status === "ok"){
+                startPolling(data.job_id);
             } else {
                 hideOverlay();
-                alert(data.message || 'Could not start job.');
+                alert("Error: " + (data.message || "Could not start job."));
             }
         })
         .catch(err=>{
-            console.error('start error', err);
             hideOverlay();
-            alert('Network / server error starting job.');
+            alert("Network error starting translation.");
         });
     });
-
-    // User clicks Show Outputs -> fetch zip and parse
-    showOutputsBtn.addEventListener('click', ()=> {
-        if(!currentJobId) return alert('No job available');
-        fetchAndParseZip(currentJobId);
-    });
-
-    // Client-side repack/download
-    downloadAllZipBtn.addEventListener('click', downloadAllAsZip);
-
-    // Helpful global for testing
-    window.__debug = { fetchAndParseZip, downloadAllAsZip };
 </script>
-</body>
-</html>
-
