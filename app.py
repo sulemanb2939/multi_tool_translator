@@ -10,9 +10,6 @@ from flask import (
     render_template,
     request,
     send_file,
-    redirect,
-    url_for,
-    flash,
     jsonify,
 )
 from deep_translator import GoogleTranslator
@@ -74,7 +71,6 @@ def chunk_text(text, max_len=MAX_CHARS_PER_CHUNK):
     return chunks
 
 
-# -------- PREMIUM FIX: Chunk-Level Smooth Progress -------- #
 def translate_big_text(text, lang_name, job, total_tasks, done_tasks):
     lang_code = LANGUAGE_CODES[lang_name]
     translator = GoogleTranslator(source="en", target=lang_code)
@@ -87,14 +83,12 @@ def translate_big_text(text, lang_name, job, total_tasks, done_tasks):
         return ""
 
     for idx, chunk in enumerate(chunks, start=1):
-        # Smooth chunk progress (per chunk)
         sub_progress = int((idx / total_chunks) * 100)
         job["sub_progress"] = sub_progress
 
         translated = translator.translate(chunk)
         translated_chunks.append(translated)
 
-        # Combine task progress + chunk progress
         base_task_progress = int((done_tasks / total_tasks) * 100)
         blended = base_task_progress + int(sub_progress / total_tasks)
 
@@ -107,7 +101,6 @@ def translate_big_text(text, lang_name, job, total_tasks, done_tasks):
     return "\n".join(translated_chunks)
 
 
-# -------- Background Translation Thread -------- #
 def run_translation_job(job_id):
     job = JOBS[job_id]
     job["status"] = "running"
@@ -125,7 +118,6 @@ def run_translation_job(job_id):
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
 
-        # Files
         for f in files_data:
             base_name = f["name"]
             text = f["text"]
@@ -142,7 +134,6 @@ def run_translation_job(job_id):
                 done_tasks += 1
                 job["progress"] = int(done_tasks / total_tasks * 100)
 
-        # Pasted Text
         if text_input:
             pseudo = f"pasted_{uuid.uuid4().hex[:4]}"
 
@@ -249,12 +240,15 @@ def progress(job_id):
     })
 
 
+# ----------------------------------------------------------------
+# 🚫 Auto Download Removed — Manual Download Only
+# ----------------------------------------------------------------
 @app.route("/download/<job_id>")
 def download(job_id):
     job = JOBS.get(job_id)
+
     if not job or job.get("status") != "done":
-        flash("Not ready yet")
-        return redirect(url_for("translator"))
+        return jsonify({"status": "error", "message": "File not ready"}), 400
 
     buf = io.BytesIO(job["zip"])
     buf.seek(0)
