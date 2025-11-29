@@ -20,6 +20,9 @@ app.secret_key = "your-secret-key"
 
 MAX_CHARS_PER_CHUNK = 5000
 
+# ---------------------------
+# LANGUAGE CODES
+# ---------------------------
 LANGUAGE_CODES = {
     "Afrikaans": "af", "Albanian": "sq", "Amharic": "am", "Arabic": "ar", "Armenian": "hy",
     "Assamese": "as", "Aymara": "ay", "Azerbaijani": "az", "Basque": "eu", "Belarusian": "be",
@@ -47,12 +50,17 @@ LANGUAGE_CODES = {
     "Xhosa": "xh", "Yiddish": "yi", "Yoruba": "yo", "Zulu": "zu",
 }
 
-# Memory job store
+# In-memory job store
 JOBS = {}
 
-
+# ---------------------------
+# Chunk text
+# ---------------------------
 def chunk_text(text, max_len=MAX_CHARS_PER_CHUNK):
-    chunks, current, length = [], [], 0
+    chunks = []
+    current = []
+    length = 0
+
     for paragraph in text.split("\n"):
         if length + len(paragraph) + 1 <= max_len:
             current.append(paragraph)
@@ -65,13 +73,24 @@ def chunk_text(text, max_len=MAX_CHARS_PER_CHUNK):
                     chunks.append(paragraph[i:i + max_len])
                 current, length = [], 0
             else:
-                current, length = [paragraph], len(paragraph) + 1
+                current = [paragraph]
+                length = len(paragraph)
+
     if current:
         chunks.append("\n".join(current))
+
     return chunks
 
-
+# ---------------------------
+# Translation with CANCEL SUPPORT
+# ---------------------------
 def translate_big_text(text, lang_name, job, total_tasks, done_tasks):
+
+    # 🛑 STOP IF CANCELLED
+    if job.get("cancel"):
+        job["message"] = "Cancelled"
+        return ""
+
     lang_code = LANGUAGE_CODES[lang_name]
     translator = GoogleTranslator(source="en", target=lang_code)
 
@@ -79,10 +98,13 @@ def translate_big_text(text, lang_name, job, total_tasks, done_tasks):
     translated_chunks = []
     total_chunks = len(chunks)
 
-    if total_chunks == 0:
-        return ""
-
     for idx, chunk in enumerate(chunks, start=1):
+
+        # 🛑 STOP MID-WAY IF CANCELLED
+        if job.get("cancel"):
+            job["message"] = "Cancelled"
+            return ""
+
         sub_progress = int((idx / total_chunks) * 100)
         job["sub_progress"] = sub_progress
 
@@ -92,16 +114,16 @@ def translate_big_text(text, lang_name, job, total_tasks, done_tasks):
         base_task_progress = int((done_tasks / total_tasks) * 100)
         blended = base_task_progress + int(sub_progress / total_tasks)
 
-        if blended > 99:
-            blended = 99
-
-        job["progress"] = blended
+        job["progress"] = min(blended, 99)
 
     job["sub_progress"] = 100
     return "\n".join(translated_chunks)
 
-
+# ---------------------------
+# Background Job Thread
+# ---------------------------
 def run_translation_job(job_id):
+
     job = JOBS[job_id]
     job["status"] = "running"
     job["start_time"] = datetime.utcnow()
@@ -116,45 +138,67 @@ def run_translation_job(job_id):
     done_tasks = 0
 
     zip_buffer = io.BytesIO()
+
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
 
+        # Files
         for f in files_data:
+            if job.get("cancel"): break
+
             base_name = f["name"]
             text = f["text"]
 
             for lang in langs:
+
+                if job.get("cancel"):
+                    break
+
                 job["message"] = f"Translating '{base_name}' → {lang}..."
 
                 translated = translate_big_text(text, lang, job, total_tasks, done_tasks)
 
                 safe_lang = lang.replace(" ", "_")
-                outname = f"{base_name}_{safe_lang}.txt"
-                zipf.writestr(outname, translated)
+                filename = f"{base_name}_{safe_lang}.txt"
+                zipf.writestr(filename, translated)
 
                 done_tasks += 1
                 job["progress"] = int(done_tasks / total_tasks * 100)
 
-        if text_input:
+        # Pasted text
+        if text_input and not job.get("cancel"):
             pseudo = f"pasted_{uuid.uuid4().hex[:4]}"
 
             for lang in langs:
+
+                if job.get("cancel"):
+                    break
+
                 job["message"] = f"Translating pasted text → {lang}..."
 
                 translated = translate_big_text(text_input, lang, job, total_tasks, done_tasks)
 
                 safe_lang = lang.replace(" ", "_")
-                outname = f"{pseudo}_{safe_lang}.txt"
-                zipf.writestr(outname, translated)
+                filename = f"{pseudo}_{safe_lang}.txt"
+                zipf.writestr(filename, translated)
 
                 done_tasks += 1
                 job["progress"] = int(done_tasks / total_tasks * 100)
 
-    job["zip"] = zip_buffer.getvalue()
-    job["status"] = "done"
-    job["progress"] = 100
-    job["message"] = "Completed!"
+    if job.get("cancel"):
+        job["status"] = "cancelled"
+        job["message"] = "Cancelled"
+        job["progress"] = 0
+        job["zip"] = None
 
+    else:
+        job["zip"] = zip_buffer.getvalue()
+        job["status"] = "done"
+        job["progress"] = 100
+        job["message"] = "Completed!"
 
+# ---------------------------
+# ROUTES
+# ---------------------------
 @app.route("/")
 def home():
     return render_template("base.html")
@@ -164,9 +208,9 @@ def home():
 def translator():
     return render_template("translator.html", languages=sorted(LANGUAGE_CODES.keys()))
 
-
 @app.route("/start-translation", methods=["POST"])
 def start_translation():
+
     langs = request.form.getlist("languages")
     if not langs:
         return jsonify({"status": "error", "message": "Select at least one language"})
@@ -182,12 +226,15 @@ def start_translation():
         for file in files:
             if file.filename == "":
                 continue
+
             name = secure_filename(file.filename)
             base, _ = os.path.splitext(name)
+
             try:
                 content = file.read().decode("utf-8", errors="ignore")
             except:
                 continue
+
             if content.strip():
                 files_data.append({"name": base, "text": content})
 
@@ -202,6 +249,7 @@ def start_translation():
         "zip": None,
         "start_time": None,
         "sub_progress": 0,
+        "cancel": False
     }
 
     t = threading.Thread(target=run_translation_job, args=(job_id,), daemon=True)
@@ -209,28 +257,37 @@ def start_translation():
 
     return jsonify({"status": "ok", "job_id": job_id})
 
-
 @app.route("/progress/<job_id>")
 def progress(job_id):
+
     job = JOBS.get(job_id)
     if not job:
         return jsonify({"status": "error", "message": "Invalid job"})
 
+    if job.get("cancel"):
+        return jsonify({
+            "status": "cancelled",
+            "progress": 0,
+            "message": "Cancelled",
+            "eta": ""
+        })
+
     progress = job.get("progress", 0)
     message = job.get("message", "")
     status = job.get("status", "")
-    start = job.get("start_time")
 
+    start_time = job.get("start_time")
     eta = ""
-    if start and 0 < progress < 100:
-        elapsed = (datetime.utcnow() - start).total_seconds()
-        if progress > 0:
-            total_est = elapsed / (progress / 100)
-            remain = int(total_est - elapsed)
-            if remain < 60:
-                eta = f"~{remain}s"
-            else:
-                eta = f"~{remain//60}m {remain%60}s"
+
+    if start_time and 0 < progress < 100:
+        elapsed = (datetime.utcnow() - start_time).total_seconds()
+        total_estimated = elapsed / (progress / 100)
+        remain = int(total_estimated - elapsed)
+
+        if remain < 60:
+            eta = f"~{remain}s"
+        else:
+            eta = f"~{remain//60}m {remain%60}s"
 
     return jsonify({
         "status": status,
@@ -239,12 +296,28 @@ def progress(job_id):
         "eta": eta
     })
 
+# ---------------------------
+# CANCEL JOB ROUTE
+# ---------------------------
+@app.route("/cancel/<job_id>", methods=["POST"])
+def cancel(job_id):
 
-# ----------------------------------------------------------------
-# 🚫 Auto Download Removed — Manual Download Only
-# ----------------------------------------------------------------
+    job = JOBS.get(job_id)
+    if not job:
+        return jsonify({"status": "error", "message": "Invalid job ID"})
+
+    job["cancel"] = True
+    job["status"] = "cancelled"
+    job["message"] = "Cancelled by user"
+
+    return jsonify({"status": "ok", "message": "Job cancelled"})
+
+# ---------------------------
+# DOWNLOAD ZIP
+# ---------------------------
 @app.route("/download/<job_id>")
 def download(job_id):
+
     job = JOBS.get(job_id)
 
     if not job or job.get("status") != "done":
