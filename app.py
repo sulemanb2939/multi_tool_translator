@@ -4,197 +4,157 @@ import io
 import zipfile
 import threading
 from datetime import datetime
-
 from flask import (
-    Flask,
-    render_template,
-    request,
-    send_file,
-    jsonify,
+    Flask, render_template, request, send_file, jsonify
 )
-from deep_translator import GoogleTranslator
 from werkzeug.utils import secure_filename
+import requests
 
 app = Flask(__name__)
 app.secret_key = "your-secret-key"
 
-MAX_CHARS_PER_CHUNK = 5000
-
-# ---------------------------
-# LANGUAGE CODES
-# ---------------------------
+# ------------------------------------
+# FULL GOOGLE TRANSLATE LANGUAGE LIST
+# ------------------------------------
 LANGUAGE_CODES = {
-    "Afrikaans": "af", "Albanian": "sq", "Amharic": "am", "Arabic": "ar", "Armenian": "hy",
-    "Assamese": "as", "Aymara": "ay", "Azerbaijani": "az", "Basque": "eu", "Belarusian": "be",
-    "Bengali": "bn", "Bosnian": "bs", "Bulgarian": "bg", "Burmese": "my", "Catalan": "ca",
-    "Cebuano": "ceb", "Chinese (Simplified)": "zh-CN", "Chinese (Traditional)": "zh-TW",
-    "Corsican": "co", "Croatian": "hr", "Czech": "cs", "Danish": "da", "Dutch": "nl",
-    "English": "en", "Esperanto": "eo", "Estonian": "et", "Filipino": "tl", "Finnish": "fi",
-    "French": "fr", "Frisian": "fy", "Galician": "gl", "Georgian": "ka", "German": "de",
-    "Greek": "el", "Gujarati": "gu", "Haitian Creole": "ht", "Hausa": "ha", "Hawaiian": "haw",
-    "Hebrew": "he", "Hindi": "hi", "Hmong": "hmn", "Hungarian": "hu", "Icelandic": "is",
-    "Igbo": "ig", "Indonesian": "id", "Irish": "ga", "Italian": "it", "Japanese": "ja",
-    "Javanese": "jv", "Kannada": "kn", "Kazakh": "kk", "Khmer": "km", "Kinyarwanda": "rw",
-    "Korean": "ko", "Kurdish (Kurmanji)": "ku", "Kurdish (Sorani)": "ckb", "Kyrgyz": "ky",
-    "Lao": "lo", "Latin": "la", "Latvian": "lv", "Lingala": "ln", "Lithuanian": "lt",
-    "Luxembourgish": "lb", "Macedonian": "mk", "Malagasy": "mg", "Malay": "ms", "Malayalam": "ml",
-    "Maltese": "mt", "Maori": "mi", "Marathi": "mr", "Mongolian": "mn", "Nepali": "ne",
-    "Norwegian": "no", "Odia (Oriya)": "or", "Pashto": "ps", "Persian (Farsi)": "fa",
-    "Polish": "pl", "Portuguese": "pt", "Punjabi": "pa", "Quechua": "qu", "Romanian": "ro",
-    "Russian": "ru", "Samoan": "sm", "Sanskrit": "sa", "Scots Gaelic": "gd", "Serbian": "sr",
-    "Sesotho": "st", "Shona": "sn", "Sindhi": "sd", "Sinhala": "si", "Slovak": "sk",
-    "Slovenian": "sl", "Somali": "so", "Spanish": "es", "Sundanese": "su", "Swahili": "sw",
-    "Swedish": "sv", "Tajik": "tg", "Tamil": "ta", "Tatar": "tt", "Telugu": "te",
-    "Thai": "th", "Tigrinya": "ti", "Turkish": "tr", "Turkmen": "tk", "Ukrainian": "uk",
-    "Urdu": "ur", "Uyghur": "ug", "Uzbek": "uz", "Vietnamese": "vi", "Welsh": "cy",
-    "Xhosa": "xh", "Yiddish": "yi", "Yoruba": "yo", "Zulu": "zu",
+    "Afrikaans": "af", "Albanian": "sq", "Amharic": "am", "Arabic": "ar",
+    "Armenian": "hy", "Assamese": "as", "Aymara": "ay", "Azerbaijani": "az",
+    "Basque": "eu", "Belarusian": "be", "Bengali": "bn", "Bosnian": "bs",
+    "Bulgarian": "bg", "Catalan": "ca", "Cebuano": "ceb", "Chinese (Simplified)": "zh-CN",
+    "Chinese (Traditional)": "zh-TW", "Corsican": "co", "Croatian": "hr", "Czech": "cs",
+    "Danish": "da", "Dutch": "nl", "English": "en", "Esperanto": "eo",
+    "Estonian": "et", "Filipino": "tl", "Finnish": "fi", "French": "fr",
+    "Galician": "gl", "Georgian": "ka", "German": "de", "Greek": "el",
+    "Gujarati": "gu", "Haitian Creole": "ht", "Hausa": "ha", "Hebrew": "he",
+    "Hindi": "hi", "Hungarian": "hu", "Icelandic": "is", "Igbo": "ig",
+    "Indonesian": "id", "Irish": "ga", "Italian": "it", "Japanese": "ja",
+    "Javanese": "jv", "Kannada": "kn", "Kazakh": "kk", "Khmer": "km",
+    "Kinyarwanda": "rw", "Korean": "ko", "Kurdish": "ku", "Kyrgyz": "ky",
+    "Lao": "lo", "Latin": "la", "Latvian": "lv", "Lithuanian": "lt",
+    "Luxembourgish": "lb", "Macedonian": "mk", "Malagasy": "mg", "Malay": "ms",
+    "Malayalam": "ml", "Maltese": "mt", "Maori": "mi", "Marathi": "mr",
+    "Mongolian": "mn", "Nepali": "ne", "Norwegian": "no", "Odia": "or",
+    "Pashto": "ps", "Persian": "fa", "Polish": "pl", "Portuguese": "pt",
+    "Punjabi": "pa", "Quechua": "qu", "Romanian": "ro", "Russian": "ru",
+    "Samoan": "sm", "Sanskrit": "sa", "Scots Gaelic": "gd", "Serbian": "sr",
+    "Sesotho": "st", "Shona": "sn", "Sindhi": "sd", "Sinhala": "si",
+    "Slovak": "sk", "Slovenian": "sl", "Somali": "so", "Spanish": "es",
+    "Sundanese": "su", "Swahili": "sw", "Swedish": "sv", "Tajik": "tg",
+    "Tamil": "ta", "Tatar": "tt", "Telugu": "te", "Thai": "th",
+    "Turkish": "tr", "Ukrainian": "uk", "Urdu": "ur", "Uyghur": "ug",
+    "Uzbek": "uz", "Vietnamese": "vi", "Welsh": "cy", "Xhosa": "xh",
+    "Yiddish": "yi", "Yoruba": "yo", "Zulu": "zu"
 }
 
-# In-memory job store
+LANGUAGES = sorted(LANGUAGE_CODES.keys())
+MAX_CHARS_PER_CHUNK = 5000
+
 JOBS = {}
 
 # ---------------------------
-# Chunk text
+# SPLIT LARGE TEXT
 # ---------------------------
-def chunk_text(text, max_len=MAX_CHARS_PER_CHUNK):
+def chunk_text(text):
     chunks = []
-    current = []
-    length = 0
-
-    for paragraph in text.split("\n"):
-        if length + len(paragraph) + 1 <= max_len:
-            current.append(paragraph)
-            length += len(paragraph) + 1
+    current = ""
+    for line in text.split("\n"):
+        if len(current) + len(line) < MAX_CHARS_PER_CHUNK:
+            current += line + "\n"
         else:
-            if current:
-                chunks.append("\n".join(current))
-            if len(paragraph) > max_len:
-                for i in range(0, len(paragraph), max_len):
-                    chunks.append(paragraph[i:i + max_len])
-                current, length = [], 0
-            else:
-                current = [paragraph]
-                length = len(paragraph)
-
-    if current:
-        chunks.append("\n".join(current))
-
+            chunks.append(current)
+            current = line + "\n"
+    if current.strip():
+        chunks.append(current)
     return chunks
 
 # ---------------------------
-# Translation with CANCEL SUPPORT
+# GOOGLE TRANSLATE FREE API
 # ---------------------------
-def translate_big_text(text, lang_name, job, total_tasks, done_tasks):
+def google_translate(text, target):
 
-    # 🛑 STOP IF CANCELLED
-    if job.get("cancel"):
-        job["message"] = "Cancelled"
-        return ""
+    url = "https://translate.googleapis.com/translate_a/single"
 
-    lang_code = LANGUAGE_CODES[lang_name]
-    translator = GoogleTranslator(source="en", target=lang_code)
+    params = {
+        "client": "gtx",
+        "sl": "auto",
+        "tl": target,
+        "dt": "t",
+        "q": text
+    }
+    try:
+        response = requests.get(url, params=params).json()
+        return "".join([sentence[0] for sentence in response[0]])
+    except:
+        return "[ERROR TRANSLATING CHUNK]"
 
+# ---------------------------
+# TRANSLATE FULL TEXT
+# ---------------------------
+def translate_big(text, lang, job, total_tasks, done_tasks):
+
+    target_code = LANGUAGE_CODES[lang]
     chunks = chunk_text(text)
-    translated_chunks = []
-    total_chunks = len(chunks)
+    output = []
 
-    for idx, chunk in enumerate(chunks, start=1):
+    for i, chunk in enumerate(chunks, start=1):
+        output.append(google_translate(chunk, target_code))
 
-        # 🛑 STOP MID-WAY IF CANCELLED
-        if job.get("cancel"):
-            job["message"] = "Cancelled"
-            return ""
+        job["sub_progress"] = int(i / len(chunks) * 100)
+        base_progress = int(done_tasks / total_tasks * 100)
+        job["progress"] = min(base_progress + int((i / len(chunks)) * (1 / total_tasks) * 100), 99)
 
-        sub_progress = int((idx / total_chunks) * 100)
-        job["sub_progress"] = sub_progress
-
-        translated = translator.translate(chunk)
-        translated_chunks.append(translated)
-
-        base_task_progress = int((done_tasks / total_tasks) * 100)
-        blended = base_task_progress + int(sub_progress / total_tasks)
-
-        job["progress"] = min(blended, 99)
-
-    job["sub_progress"] = 100
-    return "\n".join(translated_chunks)
+    return "\n".join(output)
 
 # ---------------------------
-# Background Job Thread
+# BACKGROUND JOB
 # ---------------------------
-def run_translation_job(job_id):
+def run_job(job_id):
 
     job = JOBS[job_id]
     job["status"] = "running"
-    job["start_time"] = datetime.utcnow()
     job["progress"] = 0
-    job["message"] = "Starting..."
 
-    files_data = job["files"]
+    files = job["files"]
     text_input = job["text"]
     langs = job["languages"]
 
-    total_tasks = (len(files_data) * len(langs)) + (len(langs) if text_input else 0)
-    done_tasks = 0
+    total_tasks = len(files) * len(langs)
+    if text_input:
+        total_tasks += len(langs)
 
+    done = 0
     zip_buffer = io.BytesIO()
 
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+    with zipfile.ZipFile(zip_buffer, "w") as zipf:
 
-        # Files
-        for f in files_data:
-            if job.get("cancel"): break
-
-            base_name = f["name"]
+        # files
+        for f in files:
+            name = f["name"]
             text = f["text"]
 
             for lang in langs:
+                job["message"] = f"Translating '{name}' → {lang}"
+                translated = translate_big(text, lang, job, total_tasks, done)
+                zipf.writestr(f"{name}_{lang}.txt", translated)
 
-                if job.get("cancel"):
-                    break
+                done += 1
+                job["progress"] = int(done / total_tasks * 100)
 
-                job["message"] = f"Translating '{base_name}' → {lang}..."
-
-                translated = translate_big_text(text, lang, job, total_tasks, done_tasks)
-
-                safe_lang = lang.replace(" ", "_")
-                filename = f"{base_name}_{safe_lang}.txt"
-                zipf.writestr(filename, translated)
-
-                done_tasks += 1
-                job["progress"] = int(done_tasks / total_tasks * 100)
-
-        # Pasted text
-        if text_input and not job.get("cancel"):
-            pseudo = f"pasted_{uuid.uuid4().hex[:4]}"
-
+        # pasted text
+        if text_input:
+            pseudo = f"text_{uuid.uuid4().hex[:5]}"
             for lang in langs:
+                job["message"] = f"Translating pasted text → {lang}"
+                translated = translate_big(text_input, lang, job, total_tasks, done)
+                zipf.writestr(f"{pseudo}_{lang}.txt", translated)
 
-                if job.get("cancel"):
-                    break
+                done += 1
+                job["progress"] = int(done / total_tasks * 100)
 
-                job["message"] = f"Translating pasted text → {lang}..."
-
-                translated = translate_big_text(text_input, lang, job, total_tasks, done_tasks)
-
-                safe_lang = lang.replace(" ", "_")
-                filename = f"{pseudo}_{safe_lang}.txt"
-                zipf.writestr(filename, translated)
-
-                done_tasks += 1
-                job["progress"] = int(done_tasks / total_tasks * 100)
-
-    if job.get("cancel"):
-        job["status"] = "cancelled"
-        job["message"] = "Cancelled"
-        job["progress"] = 0
-        job["zip"] = None
-
-    else:
-        job["zip"] = zip_buffer.getvalue()
-        job["status"] = "done"
-        job["progress"] = 100
-        job["message"] = "Completed!"
+    job["zip"] = zip_buffer.getvalue()
+    job["status"] = "done"
+    job["progress"] = 100
+    job["message"] = "Completed!"
 
 # ---------------------------
 # ROUTES
@@ -203,129 +163,67 @@ def run_translation_job(job_id):
 def home():
     return render_template("base.html")
 
-
 @app.route("/translator")
 def translator():
-    return render_template("translator.html", languages=sorted(LANGUAGE_CODES.keys()))
+    return render_template("translator.html", languages=LANGUAGES)
 
 @app.route("/start-translation", methods=["POST"])
 def start_translation():
 
     langs = request.form.getlist("languages")
+    files = request.files.getlist("files")
+    text = request.form.get("text_input", "").strip()
+
     if not langs:
         return jsonify({"status": "error", "message": "Select at least one language"})
 
-    files = request.files.getlist("files")
-    text_input = request.form.get("text_input", "").strip()
-
-    if (not files or files[0].filename == "") and not text_input:
+    if (not files or files[0].filename == "") and not text:
         return jsonify({"status": "error", "message": "Upload files or paste text"})
 
-    files_data = []
-    if files and files[0].filename != "":
-        for file in files:
-            if file.filename == "":
-                continue
-
-            name = secure_filename(file.filename)
-            base, _ = os.path.splitext(name)
-
-            try:
-                content = file.read().decode("utf-8", errors="ignore")
-            except:
-                continue
-
-            if content.strip():
-                files_data.append({"name": base, "text": content})
+    file_data = []
+    for f in files:
+        if f.filename == "":
+            continue
+        name = secure_filename(f.filename)
+        base = os.path.splitext(name)[0]
+        content = f.read().decode("utf-8", errors="ignore")
+        file_data.append({"name": base, "text": content})
 
     job_id = uuid.uuid4().hex[:10]
+
     JOBS[job_id] = {
         "status": "queued",
         "progress": 0,
-        "message": "Queued",
-        "files": files_data,
-        "text": text_input,
-        "languages": langs,
-        "zip": None,
-        "start_time": None,
+        "message": "Starting...",
         "sub_progress": 0,
-        "cancel": False
+        "files": file_data,
+        "text": text,
+        "languages": langs,
+        "zip": None
     }
 
-    t = threading.Thread(target=run_translation_job, args=(job_id,), daemon=True)
-    t.start()
+    threading.Thread(target=run_job, args=(job_id,), daemon=True).start()
 
     return jsonify({"status": "ok", "job_id": job_id})
 
 @app.route("/progress/<job_id>")
 def progress(job_id):
-
     job = JOBS.get(job_id)
     if not job:
-        return jsonify({"status": "error", "message": "Invalid job"})
+        return jsonify({"status": "error"})
 
-    if job.get("cancel"):
-        return jsonify({
-            "status": "cancelled",
-            "progress": 0,
-            "message": "Cancelled",
-            "eta": ""
-        })
+    safe_job = dict(job)
+    safe_job["zip"] = None
+    return jsonify(safe_job)
 
-    progress = job.get("progress", 0)
-    message = job.get("message", "")
-    status = job.get("status", "")
-
-    start_time = job.get("start_time")
-    eta = ""
-
-    if start_time and 0 < progress < 100:
-        elapsed = (datetime.utcnow() - start_time).total_seconds()
-        total_estimated = elapsed / (progress / 100)
-        remain = int(total_estimated - elapsed)
-
-        if remain < 60:
-            eta = f"~{remain}s"
-        else:
-            eta = f"~{remain//60}m {remain%60}s"
-
-    return jsonify({
-        "status": status,
-        "progress": progress,
-        "message": message,
-        "eta": eta
-    })
-
-# ---------------------------
-# CANCEL JOB ROUTE
-# ---------------------------
-@app.route("/cancel/<job_id>", methods=["POST"])
-def cancel(job_id):
-
-    job = JOBS.get(job_id)
-    if not job:
-        return jsonify({"status": "error", "message": "Invalid job ID"})
-
-    job["cancel"] = True
-    job["status"] = "cancelled"
-    job["message"] = "Cancelled by user"
-
-    return jsonify({"status": "ok", "message": "Job cancelled"})
-
-# ---------------------------
-# DOWNLOAD ZIP
-# ---------------------------
 @app.route("/download/<job_id>")
 def download(job_id):
-
     job = JOBS.get(job_id)
-
-    if not job or job.get("status") != "done":
-        return jsonify({"status": "error", "message": "File not ready"}), 400
+    if not job or job["status"] != "done":
+        return jsonify({"status": "error"}), 400
 
     buf = io.BytesIO(job["zip"])
     buf.seek(0)
-
     return send_file(
         buf,
         as_attachment=True,
@@ -333,6 +231,5 @@ def download(job_id):
         mimetype="application/zip"
     )
 
-
 if __name__ == "__main__":
-    app.run(debug=True, threaded=True)
+    app.run(debug=True)
