@@ -1,3 +1,2 @@
-flask
-deep-translator
-gunicorn
+Flask==2.2.5
+requests==2.31.0
